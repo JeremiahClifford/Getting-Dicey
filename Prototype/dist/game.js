@@ -90,11 +90,11 @@ const Buy = () => {
         money -= newDieCost;
         newDieCost += 10;
         AddDie();
+        PrintDiceList();
     }
     else {
         console.log(`Insufficient Funds`);
     }
-    PrintDiceList();
     PlayerAction();
 };
 const PlayerAction = () => {

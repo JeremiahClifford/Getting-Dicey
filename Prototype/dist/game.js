@@ -95,6 +95,7 @@ const Buy = () => {
     else {
         console.log(`Insufficient Funds`);
     }
+    PrintDiceList();
     PlayerAction();
 };
 const PlayerAction = () => {

@@ -1,1 +1,1 @@
-To run this game, run the command "node dist/game.js" in the command line
+To run this game, run the command "node dist/game.js" in the command line or execute the run.sh bash script in the terminal.

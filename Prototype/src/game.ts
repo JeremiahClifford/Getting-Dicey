@@ -122,6 +122,7 @@ const Buy = (): void => {
         console.log(`Insufficient Funds`)
     }
 
+    PrintDiceList()
     PlayerAction()
 }
 

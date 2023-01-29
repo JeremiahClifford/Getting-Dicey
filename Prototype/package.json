@@ -1,0 +1,14 @@
+{
+  "name": "getting-dicey-mvi",
+  "version": "0.0.1",
+  "description": "CLI Prototype for our casual game project \"Getting Dicey\"",
+  "main": "dist/game.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "JeremiahClifford",
+  "license": "ISC",
+  "dependencies": {
+    "readline": "^1.3.0"
+  }
+}

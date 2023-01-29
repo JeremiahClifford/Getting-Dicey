@@ -60,7 +60,6 @@ const AddDie = (): void => { //adds a die to the player's list of dice and recal
 const PrintDiceList = (): void => {
     console.log(`Your Dice:`)
     dice.forEach((d) => console.log(`${d.sides.length} Sides: ${d.sides}`))
-    PlayerAction()
 }
 
 const PrintOptions = (): void => {
@@ -138,6 +137,7 @@ const PlayerAction = (): void => {
                 break
             case 'v':
                 PrintDiceList()
+                PlayerAction()
                 break
             default:
                 console.log(`default case`)

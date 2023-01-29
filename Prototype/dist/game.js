@@ -42,7 +42,6 @@ const AddDie = () => {
 const PrintDiceList = () => {
     console.log(`Your Dice:`);
     dice.forEach((d) => console.log(`${d.sides.length} Sides: ${d.sides}`));
-    PlayerAction();
 };
 const PrintOptions = () => {
     console.log(`[S]pin | [B]uy a random die (Cost: ${newDieCost}) | [V]iew your Dice`);
@@ -110,6 +109,7 @@ const PlayerAction = () => {
                 break;
             case 'v':
                 PrintDiceList();
+                PlayerAction();
                 break;
             default:
                 console.log(`default case`);

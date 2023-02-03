@@ -33,9 +33,9 @@ public class GameManager : MonoBehaviour
             RollButton();
         };
 
-        DicePreset dicePreset = Resources.Load<DicePreset>("DicePresets/D6Preset");
-        dice.Add(dicePreset.GetDiceObject());
-        dice.Add(dicePreset.GetDiceObject());
+        Die die = Resources.Load<Die>("Prefabs/d6");
+        dice.Add(GameObject.Instantiate<Die>(die));
+        dice.Add(GameObject.Instantiate<Die>(die));
         foreach (Die i in dice)
         {
             i.gameObject.SetActive(false);

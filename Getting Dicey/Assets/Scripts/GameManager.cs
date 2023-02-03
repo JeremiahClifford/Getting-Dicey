@@ -9,13 +9,15 @@ public class GameManager : MonoBehaviour
     private TMP_Text moneyLabel;
 
     private float money;
+    private int index;
+
     public float Money
     {
         get { return money; }
         set { money = value; }
     }
 
-    private List<DieBehavior> dice = new List<DieBehavior>();
+    private List<Die> dice = new List<Die>();
 
     /// <summary>
     /// Called before the first active frame
@@ -25,6 +27,10 @@ public class GameManager : MonoBehaviour
         DicePreset dicePreset = Resources.Load<DicePreset>("DicePresets/D6Preset");
         dice.Add(dicePreset.GetDiceObject());
         dice.Add(dicePreset.GetDiceObject());
+        foreach (Die i in dice)
+        {
+            i.gameObject.SetActive(false);
+        }
     }
 
     /// <summary>
@@ -40,6 +46,13 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void Roll()
     {
-        List<int> results = new List<int>();
+        dice[index].gameObject.SetActive(true);
+        dice[index].gameObject.transform.position = new Vector3(0f, 0f, 0f);
+        dice[index].gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+        index++;
+        if (index >= dice.Count)
+        {
+            index = 0;
+        }
     }
 }

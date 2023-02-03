@@ -9,7 +9,7 @@ using UnityEngine;
 public class DicePreset : ScriptableObject
 {
     [SerializeField]
-    private DieBehavior prefab;
+    private Die prefab;
 
     [SerializeField]
     private List<int> values = new List<int>();
@@ -32,10 +32,9 @@ public class DicePreset : ScriptableObject
     /// Creates a new die gameobject
     /// </summary>
     /// <returns>A new instance of the die defined by this preset.</returns>
-    public DieBehavior GetDiceObject()
+    public Die GetDiceObject()
     {
-        DieBehavior diceObject = GameObject.Instantiate<DieBehavior>(prefab);
-        diceObject.Values = new List<int>(Values);
+        Die diceObject = GameObject.Instantiate<Die>(prefab);
         return diceObject;
     }
 }

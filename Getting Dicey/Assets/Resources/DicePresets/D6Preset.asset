@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f363979c6585074c8a9c2ab3bbe27ee, type: 3}
   m_Name: D6Preset
   m_EditorClassIdentifier: 
+  prefab: {fileID: 11400000, guid: 3bbbc25881226434b86bd98e9424cd6c, type: 3}
   values: 010000000200000003000000040000000500000006000000
-  prefab: {fileID: 2410291691510522503, guid: 02c773caa6fa39b41ae1a5076bc6bb90, type: 3}

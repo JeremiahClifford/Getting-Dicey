@@ -16,6 +16,7 @@
  */  
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Die base class to determine if a die is rolling and to calculate it's current value
@@ -38,7 +39,10 @@ public class Die : MonoBehaviour {
 	// hitVector check margin
     protected float validMargin = 0.45F;
 
-	// true is die is still rolling
+    [SerializeField]
+    public List<int> sides;
+
+    // true is die is still rolling
     public bool rolling
     {
         get

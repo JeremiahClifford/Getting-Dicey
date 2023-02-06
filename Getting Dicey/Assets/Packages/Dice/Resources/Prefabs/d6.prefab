@@ -99,6 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   value: 5
+  sides: 010000000200000003000000040000000500000006000000
 --- !u!65 &6500000
 BoxCollider:
   m_ObjectHideFlags: 0

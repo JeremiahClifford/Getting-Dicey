@@ -18,8 +18,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputAction rollDiceAction;
 
-    //private float money;
-    //private bool isRolling = false;
+    private bool isRolling = false;
 
     //important variables for game logic
     public int money; //amount of money that the player has
@@ -30,30 +29,29 @@ public class GameManager : MonoBehaviour
     private int[] possibleSideNumbers; //stores how many sides any given dice can have
 
     private List<Die> allDice = new List<Die>();
+    private List<Die> rollingDice = new List<Die>();
+    private List<Die> rolledDice = new List<Die>();
+
     public List<o_Die> activeDice = new List<o_Die>(); //stores the dice that the player rolls
     public List<o_Die> inactiveDice = new List<o_Die>(); //stores the dice that the player owns but does not roll, currently unused
-    private List<Die> rolledDice = new List<Die>();
 
     /// <summary>
     /// Called before the first active frame
     /// </summary>
     public void Start()
     {
-        /*
+        // Press space to roll dice
         rollDiceAction.Enable();
         rollDiceAction.performed += (InputAction.CallbackContext obj) =>
         {
             RollButton();
         };
 
+        // Creates starting inventory
         Die die = Resources.Load<Die>("Prefabs/d6");
-        allDice.Add(GameObject.Instantiate<Die>(die));
-        allDice.Add(GameObject.Instantiate<Die>(die));
-        foreach (Die i in allDice)
-        {
-            i.gameObject.SetActive(false);
-        }
-        */
+        //allDice.Add(GameObject.Instantiate<Die>(die));
+        //allDice.Add(GameObject.Instantiate<Die>(die));
+
         money = 0; //sets money to 0
         SetMoneyLabel(); //updates the money label
         newDieCost = 30; //sets the new die cost to the default value
@@ -63,7 +61,9 @@ public class GameManager : MonoBehaviour
         debt = 500; //sets the debt to the default value
         possibleSideNumbers = new int[] {2, 4, 6, 8, 10, 12, 20}; //sets the list of possible side numbers
         for (int i = 0; i < 3; i++) { //adds the default number of dice (3) of random side numbers to the players active dice
-            activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
+            //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
+            allDice.Add(GameObject.Instantiate<Die>(die));
+            allDice[i].gameObject.SetActive(false);
         }
         range = new int[2]; //sets up the range
         range[0] = 999999;
@@ -86,27 +86,26 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void Update()
     {
-        /*
-        moneyLabel.text = "$" + Money;
+        moneyLabel.text = "$" + money;
 
         if (isRolling)
         {
-            for (int i = activeDice.Count - 1; i >= 0; i--)
+            for (int i = rollingDice.Count - 1; i >= 0; i--)
             {
-                if (!activeDice[i].rolling)
+                if (!rollingDice[i].rolling)
                 {
-                    rolledDice.Add(activeDice[i]);
-                    activeDice.RemoveAt(i);
+                    rolledDice.Add(rollingDice[i]);
+                    rollingDice.RemoveAt(i);
                 }
             }
-            if (activeDice.Count == 0)
+            if (rollingDice.Count == 0)
             {
+                Debug.Log("Test");
                 FinishedRolling();
                 isRolling = false;
                 rolledDice.Clear();
             }
         }
-        */
     }
 
     private void CalculateRange() { //used to calculate the range of possible rolls for optimization
@@ -125,7 +124,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RollButton() //rolls all of the dice and parses the results when the roll button is pressed
     {
-        /*
         if (!isRolling)
         {
             isRolling = true;
@@ -134,7 +132,7 @@ public class GameManager : MonoBehaviour
                 RollDie(i);
             }
         }
-        */
+
         //variables to hold info during parsing
         List<int> results = new List<int>();
         int totalPayout = 0;
@@ -231,13 +229,11 @@ public class GameManager : MonoBehaviour
     /// <param name="die"></param>
     private void RollDie(Die die)
     {
-        /*
-        activeDice.Add(die);
+        rollingDice.Add(die);
         die.gameObject.SetActive(true);
         die.gameObject.transform.position = new Vector3(0f, 35f, -55f);
         die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f));
         die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 35f);
-        */
     }
 
     /// <summary>
@@ -245,11 +241,55 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private void FinishedRolling()
     {
-        /*
+        List<int> results = new List<int>();
+        int totalPayout = 0;
+
         foreach (Die d in rolledDice)
         {
-            money += d.value;
+            results.Add(d.value);
         }
-        */
+
+        //displays the results to the screen
+        outputLabel.text = "Results:";
+        for (int i = 0; i < results.Count; i++)
+        {
+            outputLabel.text += " " + results[i];
+        }
+
+        //parses the results, calculating the total payout and writing it to the display
+        for (int i = range[0]; i < range[1] + 1; i++)
+        {
+            int numberOfInstances = 0;
+            for (int j = 0; j < results.Count; j++)
+            {
+                if (results[j] == i)
+                {
+                    numberOfInstances++;
+                }
+            }
+            if (numberOfInstances > 1)
+            {
+                outputLabel.text += "<br>" + numberOfInstances + " " + i + "'s : " + (i * (numberOfInstances - 1) * 10);
+                totalPayout += i * (numberOfInstances - 1) * 10;
+            }
+        }
+        outputLabel.text += "<br>Total Payout: " + totalPayout;
+        money += totalPayout;
+        SetMoneyLabel();
+
+        //checks if the player wins or loses
+        if (money >= debt)
+        {
+            outputLabel.text += "<br>Game over:<br>You Win";
+        }
+        else
+        {
+            turnsRemaining--;
+            SetTurnsRemainingLabel();
+            if (turnsRemaining <= 0)
+            {
+                outputLabel.text += "<br>Game over:<br>You have Run out of time";
+            }
+        }
     }
 }

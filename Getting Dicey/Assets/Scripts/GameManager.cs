@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputAction rollDiceAction;
 
+    Die d6;
+
     private bool isRolling = false;
 
     //important variables for game logic
@@ -48,7 +50,8 @@ public class GameManager : MonoBehaviour
         };
 
         // Creates starting inventory
-        Die die = Resources.Load<Die>("Prefabs/d6");
+        //Die die = Resources.Load<Die>("Prefabs/d6");
+        d6 = Resources.Load<Die>("Prefabs/d6");
         //allDice.Add(GameObject.Instantiate<Die>(die));
         //allDice.Add(GameObject.Instantiate<Die>(die));
 
@@ -62,7 +65,7 @@ public class GameManager : MonoBehaviour
         possibleSideNumbers = new int[] {2, 4, 6, 8, 10, 12, 20}; //sets the list of possible side numbers
         for (int i = 0; i < 3; i++) { //adds the default number of dice (3) of random side numbers to the players active dice
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
-            allDice.Add(GameObject.Instantiate<Die>(die));
+            allDice.Add(GameObject.Instantiate<Die>(d6));
             allDice[i].gameObject.SetActive(false);
         }
         range = new int[2]; //sets up the range
@@ -109,6 +112,7 @@ public class GameManager : MonoBehaviour
     }
 
     private void CalculateRange() { //used to calculate the range of possible rolls for optimization
+        /*
         for (int i = 0; i < activeDice.Count; i++) {
             if (activeDice[i].sides[0] < range[0]) {
                 range[0] = activeDice[i].sides[0];
@@ -117,6 +121,9 @@ public class GameManager : MonoBehaviour
                 range[1] = activeDice[i].sides[activeDice[i].sides.Length-1];
             }
         }
+        */
+        range[0] = 1;
+        range[1] = 6;
     }
 
     /// <summary>
@@ -179,7 +186,9 @@ public class GameManager : MonoBehaviour
 
     public void BuyButton() { //adds a new dice if the player has enough money when the buy button is pressed
         if (money >= newDieCost) {
-            activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
+            allDice.Add(GameObject.Instantiate<Die>(d6));
+            allDice[allDice.Count-1].gameObject.SetActive(false);
+            //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
             money -= newDieCost;
             newDieCost += 10;
             SetMoneyLabel();

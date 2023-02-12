@@ -173,7 +173,7 @@ public class GameManager : MonoBehaviour
         SetMoneyLabel();
 
         //checks if the player wins or loses
-        if (money >= debt) {
+        /*if (money >= debt) {
             outputLabel.text += "<br>Game over:<br>You Win";
         } else {
             turnsRemaining--;
@@ -181,7 +181,7 @@ public class GameManager : MonoBehaviour
             if (turnsRemaining <= 0) {
                 outputLabel.text += "<br>Game over:<br>You have Run out of time";
             }
-        }
+        }*/
     }
 
     public void BuyButton() { //adds a new dice if the player has enough money when the buy button is pressed
@@ -201,10 +201,10 @@ public class GameManager : MonoBehaviour
 
     public void ViewButton() { //shows what dice the player has when the view button is pressed or when a new die is bought
         outputLabel.text = "Your Active Dice:<br>";
-        for (int i = 0; i < activeDice.Count; i++) {
-            outputLabel.text += "d" + activeDice[i].sides.Length + ":";
-            for (int j = 0; j < activeDice[i].sides.Length; j++) {
-                outputLabel.text += " " + activeDice[i].sides[j];
+        for (int i = 0; i < allDice.Count; i++) {
+            outputLabel.text += "d" + allDice[i].sides.Count + ":";
+            for (int j = 0; j < allDice[i].sides.Count; j++) {
+                outputLabel.text += " " + allDice[i].sides[j];
             }
             outputLabel.text += "<br>";
         }

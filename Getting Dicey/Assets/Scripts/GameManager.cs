@@ -14,6 +14,16 @@ public class GameManager : MonoBehaviour
     private TMP_Text newDiceCostLabel;
     [SerializeField]
     private TMP_Text turnsRemainingLabel;
+    [SerializeField]
+    private TMP_Text debtLabel;
+
+    [SerializeField]
+    private GameObject inventoryPanel;
+    [SerializeField]
+    private GameObject ActiveDiceList;
+
+    [SerializeField]
+    public TMP_Text diceLabelPrefab;
 
     [SerializeField]
     private InputAction rollDiceAction;
@@ -27,7 +37,7 @@ public class GameManager : MonoBehaviour
     private int[] range; //holds the highest and lowest number that any of the player's dice can roll for optimization purposes while parsing results of a roll
     private int newDieCost; //tracks the cost of a new die, increasing with each purchase
     private int turnsRemaining; //tracks how many turns the player has left, decreasing with each roll
-    private int debt; //stores how much debt the player has, currently is a static goal
+    private float debt; //stores how much debt the player has, currently is a static goal
     private int[] possibleSideNumbers; //stores how many sides any given dice can have
 
     private List<Die> allDice = new List<Die>();
@@ -55,18 +65,22 @@ public class GameManager : MonoBehaviour
         //allDice.Add(GameObject.Instantiate<Die>(die));
         //allDice.Add(GameObject.Instantiate<Die>(die));
 
+        inventoryPanel.SetActive(false);
+
         money = 0; //sets money to 0
         SetMoneyLabel(); //updates the money label
         newDieCost = 30; //sets the new die cost to the default value
-        SetNewDiceCostLabel();//updates the new die cost label
+        SetNewDiceCostLabel(); //updates the new die cost label
         turnsRemaining = 20; //set the number of remaining turns to the default value
         SetTurnsRemainingLabel(); //updates the turns remaining label
-        debt = 500; //sets the debt to the default value
+        debt = 500.0f; //sets the debt to the default value
+        SetDebtLabel(); //sets the debt label on the UI
         possibleSideNumbers = new int[] {2, 4, 6, 8, 10, 12, 20}; //sets the list of possible side numbers
         for (int i = 0; i < 3; i++) { //adds the default number of dice (3) of random side numbers to the players active dice
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
             allDice.Add(GameObject.Instantiate<Die>(d6));
             allDice[i].gameObject.SetActive(false);
+            CreateDieLabel(allDice[i]);
         }
         range = new int[2]; //sets up the range
         range[0] = 999999;
@@ -89,8 +103,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void Update()
     {
-        moneyLabel.text = "$" + money;
-
         if (isRolling)
         {
             for (int i = rollingDice.Count - 1; i >= 0; i--)
@@ -171,6 +183,7 @@ public class GameManager : MonoBehaviour
         outputLabel.text += "<br>Total Payout: " + totalPayout;
         money += totalPayout;
         SetMoneyLabel();
+        CalculateInterest();
 
         //checks if the player wins or loses
         /*if (money >= debt) {
@@ -208,6 +221,7 @@ public class GameManager : MonoBehaviour
             }
             outputLabel.text += "<br>";
         }
+        inventoryPanel.SetActive(true);
         /*
         outputLabel.text += "Your Inactive Dice:<br>";
         for (int i = 0; i < inactiveDice.Count; i++) {
@@ -220,6 +234,11 @@ public class GameManager : MonoBehaviour
         */
     }
 
+    private void CalculateInterest() {
+        debt *= 1.01f;
+        SetDebtLabel();
+    }
+
     private void SetMoneyLabel() { //sets the money label
         moneyLabel.text = "$" + money;
     }
@@ -230,6 +249,19 @@ public class GameManager : MonoBehaviour
 
     private void SetTurnsRemainingLabel() { //sets the turns remaining label
         turnsRemainingLabel.text = "Turns Remaining: " + turnsRemaining;
+    }
+
+    private void SetDebtLabel() {
+        debtLabel.text = "Debt: " + Mathf.Floor(debt);
+    }
+
+    private void CreateDieLabel(Die die) {
+        diceLabelPrefab.text = "D" + die.sides.Count + ":";
+        for (int j = 0; j < die.sides.Count; j++) {
+            diceLabelPrefab.text += " " + die.sides[j];
+        }
+        TMP_Text temp = Instantiate(diceLabelPrefab, ActiveDiceList.transform);
+        temp.transform.position += new Vector3(-25.0f, 0.0f, 0.0f); //TODO: this should not move already instantiated instances but it does
     }
 
     /// <summary>

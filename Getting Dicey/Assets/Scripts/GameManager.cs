@@ -75,8 +75,9 @@ public class GameManager : MonoBehaviour
         SetTurnsRemainingLabel(); //updates the turns remaining label
         debt = 500.0f; //sets the debt to the default value
         SetDebtLabel(); //sets the debt label on the UI
-        possibleSideNumbers = new int[] {2, 4, 6, 8, 10, 12, 20}; //sets the list of possible side numbers
-        for (int i = 0; i < 3; i++) { //adds the default number of dice (3) of random side numbers to the players active dice
+        possibleSideNumbers = new int[] { 2, 4, 6, 8, 10, 12, 20 }; //sets the list of possible side numbers
+        for (int i = 0; i < 3; i++)
+        { //adds the default number of dice (3) of random side numbers to the players active dice
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
             allDice.Add(GameObject.Instantiate<Die>(d6));
             allDice[i].gameObject.SetActive(false);
@@ -88,9 +89,11 @@ public class GameManager : MonoBehaviour
         CalculateRange(); //calculates the range
         //the below section adds the players active dice to the default text of the display at the start
         outputLabel.text += "<br>Your Active Dice:<br>";
-        for (int i = 0; i < activeDice.Count; i++) {
+        for (int i = 0; i < activeDice.Count; i++)
+        {
             outputLabel.text += "d" + activeDice[i].sides.Length + ":";
-            for (int j = 0; j < activeDice[i].sides.Length; j++) {
+            for (int j = 0; j < activeDice[i].sides.Length; j++)
+            {
                 outputLabel.text += " " + activeDice[i].sides[j];
             }
             outputLabel.text += "<br>";
@@ -101,29 +104,61 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// Called every frame
     /// </summary>
-    public void Update()
+    public void LateUpdate()
     {
-        if (isRolling)
+        foreach (Die d in rollingDice)
         {
+            Debug.Log(d.value);
+        }
+            if (isRolling)
+        {
+            bool check = true;
+            foreach (Die d in rollingDice)
+            {
+                if (d.rolling)
+                {
+                    check = false; break;
+                }
+            }
+            if (check)
+            {
+                foreach (Die d in rollingDice)
+                {
+                    rolledDice.Add(d);
+                }
+                rollingDice.Clear();
+                FinishedRolling();
+                isRolling = false;
+                rolledDice.Clear();
+            }
+
+            /*
             for (int i = rollingDice.Count - 1; i >= 0; i--)
             {
                 if (!rollingDice[i].rolling)
                 {
+                    Debug.Log(rollingDice[i].value);
                     rolledDice.Add(rollingDice[i]);
                     rollingDice.RemoveAt(i);
                 }
             }
             if (rollingDice.Count == 0)
             {
-                Debug.Log("Test");
+                foreach (Die d in rolledDice)
+                {
+                    Debug.Log(d.value);
+                }
                 FinishedRolling();
                 isRolling = false;
                 rolledDice.Clear();
             }
         }
+            */
+        }
     }
 
-    private void CalculateRange() { //used to calculate the range of possible rolls for optimization
+    private void CalculateRange()
+    { //used to calculate the range of possible rolls for optimization
         /*
         for (int i = 0; i < activeDice.Count; i++) {
             if (activeDice[i].sides[0] < range[0]) {
@@ -151,31 +186,37 @@ public class GameManager : MonoBehaviour
                 RollDie(i);
             }
         }
-
+        /*
         //variables to hold info during parsing
         List<int> results = new List<int>();
         int totalPayout = 0;
 
         //rolls all the dice and saves their results to the results list
-        for (int i = 0; i < activeDice.Count; i++) {
+        for (int i = 0; i < activeDice.Count; i++)
+        {
             results.Add(activeDice[i].Roll());
         }
-        
+
         //displays the results to the screen
         outputLabel.text = "Results:";
-        for (int i = 0; i < results.Count; i++) {
+        for (int i = 0; i < results.Count; i++)
+        {
             outputLabel.text += " " + results[i];
         }
 
         //parses the results, calculating the total payout and writing it to the display
-        for (int i = range[0]; i < range[1]+1; i++) {
+        for (int i = range[0]; i < range[1] + 1; i++)
+        {
             int numberOfInstances = 0;
-            for (int j = 0; j < results.Count; j++) {
-                if (results[j] == i) {
+            for (int j = 0; j < results.Count; j++)
+            {
+                if (results[j] == i)
+                {
                     numberOfInstances++;
                 }
             }
-            if (numberOfInstances > 1) {
+            if (numberOfInstances > 1)
+            {
                 outputLabel.text += "<br>" + numberOfInstances + " " + i + "'s : " + (i * (numberOfInstances - 1) * 10);
                 totalPayout += i * (numberOfInstances - 1) * 10;
             }
@@ -184,6 +225,7 @@ public class GameManager : MonoBehaviour
         money += totalPayout;
         SetMoneyLabel();
         CalculateInterest();
+        */
 
         //checks if the player wins or loses
         /*if (money >= debt) {
@@ -197,26 +239,33 @@ public class GameManager : MonoBehaviour
         }*/
     }
 
-    public void BuyButton() { //adds a new dice if the player has enough money when the buy button is pressed
-        if (money >= newDieCost) {
+    public void BuyButton()
+    { //adds a new dice if the player has enough money when the buy button is pressed
+        if (money >= newDieCost)
+        {
             allDice.Add(GameObject.Instantiate<Die>(d6));
-            allDice[allDice.Count-1].gameObject.SetActive(false);
+            allDice[allDice.Count - 1].gameObject.SetActive(false);
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
             money -= newDieCost;
             newDieCost += 10;
             SetMoneyLabel();
             SetNewDiceCostLabel();
             ViewButton();
-        } else {
+        }
+        else
+        {
             outputLabel.text = "Insufficient Money to purchase a new die.";
         }
     }
 
-    public void ViewButton() { //shows what dice the player has when the view button is pressed or when a new die is bought
+    public void ViewButton()
+    { //shows what dice the player has when the view button is pressed or when a new die is bought
         outputLabel.text = "Your Active Dice:<br>";
-        for (int i = 0; i < allDice.Count; i++) {
+        for (int i = 0; i < allDice.Count; i++)
+        {
             outputLabel.text += "d" + allDice[i].sides.Count + ":";
-            for (int j = 0; j < allDice[i].sides.Count; j++) {
+            for (int j = 0; j < allDice[i].sides.Count; j++)
+            {
                 outputLabel.text += " " + allDice[i].sides[j];
             }
             outputLabel.text += "<br>";
@@ -234,30 +283,37 @@ public class GameManager : MonoBehaviour
         */
     }
 
-    private void CalculateInterest() {
+    private void CalculateInterest()
+    {
         debt *= 1.01f;
         SetDebtLabel();
     }
 
-    private void SetMoneyLabel() { //sets the money label
+    private void SetMoneyLabel()
+    { //sets the money label
         moneyLabel.text = "$" + money;
     }
 
-    private void SetNewDiceCostLabel() { //sets the new die cost label
+    private void SetNewDiceCostLabel()
+    { //sets the new die cost label
         newDiceCostLabel.text = "New Dice Cost: " + newDieCost;
     }
 
-    private void SetTurnsRemainingLabel() { //sets the turns remaining label
+    private void SetTurnsRemainingLabel()
+    { //sets the turns remaining label
         turnsRemainingLabel.text = "Turns Remaining: " + turnsRemaining;
     }
 
-    private void SetDebtLabel() {
+    private void SetDebtLabel()
+    {
         debtLabel.text = "Debt: " + Mathf.Floor(debt);
     }
 
-    private void CreateDieLabel(Die die) {
+    private void CreateDieLabel(Die die)
+    {
         diceLabelPrefab.text = "D" + die.sides.Count + ":";
-        for (int j = 0; j < die.sides.Count; j++) {
+        for (int j = 0; j < die.sides.Count; j++)
+        {
             diceLabelPrefab.text += " " + die.sides[j];
         }
         TMP_Text temp = Instantiate(diceLabelPrefab, ActiveDiceList.transform);

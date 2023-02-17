@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log(d.value);
         }
-            if (isRolling)
+        if (isRolling)
         {
             bool check = true;
             foreach (Die d in rollingDice)
@@ -113,21 +113,22 @@ public class GameManager : MonoBehaviour
                 }
                 rollingDice.Clear();
                 FinishedRolling();
-                isRolling = false;
-                rolledDice.Clear();
             }
         }
     }
 
     private void CalculateRange()
     { //used to calculate the range of possible rolls for optimization
-        
-        for (int i = 0; i < allDice.Count; i++) {
-            if (allDice[i].sides[0] < range[0]) {
+
+        for (int i = 0; i < allDice.Count; i++)
+        {
+            if (allDice[i].sides[0] < range[0])
+            {
                 range[0] = allDice[i].sides[0];
             }
-            if (allDice[i].sides[allDice[i].sides.Count-1] > range[1]) {
-                range[1] = allDice[i].sides[allDice[i].sides.Count-1];
+            if (allDice[i].sides[allDice[i].sides.Count - 1] > range[1])
+            {
+                range[1] = allDice[i].sides[allDice[i].sides.Count - 1];
             }
         }
     }
@@ -149,7 +150,8 @@ public class GameManager : MonoBehaviour
         outputLabel.text = "";
     }
 
-    public void ShopButton() {
+    public void ShopButton()
+    {
         shopPanel.SetActive(true);
     }
 
@@ -170,12 +172,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Payoff(int amount) {
-        if (amount <= money) {
+    public void Payoff(int amount)
+    {
+        if (amount <= money)
+        {
             money -= amount;
             debt -= amount;
         }
-        if (debt <= 0) {
+        if (debt <= 0)
+        {
             money += -debt;
             debt = 0;
             outputLabel.text = "<br>Game over:<br>You Win";
@@ -204,11 +209,13 @@ public class GameManager : MonoBehaviour
         inventoryPanel.SetActive(true);
     }
 
-    public void CloseInventoryButton() {
+    public void CloseInventoryButton()
+    {
         inventoryPanel.SetActive(false);
     }
 
-    public void CloseShopButton() {
+    public void CloseShopButton()
+    {
         shopPanel.SetActive(false);
     }
 
@@ -238,7 +245,8 @@ public class GameManager : MonoBehaviour
         debtLabel.text = "Debt: " + Mathf.Round(debt);
     }
 
-    public void SaveAndExit() {
+    public void SaveAndExit()
+    {
         //TODO: save
 
         SceneManager.LoadScene(0, LoadSceneMode.Single); //exit
@@ -267,6 +275,10 @@ public class GameManager : MonoBehaviour
 
         foreach (Die d in rolledDice)
         {
+            if (d.value == 0)
+            {
+                return;
+            }
             results.Add(d.value);
         }
 
@@ -313,5 +325,8 @@ public class GameManager : MonoBehaviour
                 outputLabel.text += "<br>Game over:<br>You have Run out of time";
             }
         }
+
+        isRolling = false;
+        rolledDice.Clear();
     }
 }

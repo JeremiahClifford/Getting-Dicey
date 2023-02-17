@@ -48,14 +48,10 @@ public class Die : MonoBehaviour
     {
         get
         {
-            if (value == 0)
-            {
-                return true;
-            }
             return !(GetComponent<Rigidbody>().velocity.sqrMagnitude < .1F && GetComponent<Rigidbody>().angularVelocity.sqrMagnitude < .1F);
         }
     }
-
+     
     // calculate the normalized hit vector and should always return true
     protected bool localHit
     {

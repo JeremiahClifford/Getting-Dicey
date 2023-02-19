@@ -28,6 +28,10 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject shopPanel;
 
+    //payout guide
+    [SerializeField]
+    private GameObject guidePanel;
+
     [SerializeField]
     private InputAction rollDiceAction;
 
@@ -42,6 +46,7 @@ public class GameManager : MonoBehaviour
     private int turnsRemaining; //tracks how many turns the player has left, decreasing with each roll
     private float debt; //stores how much debt the player has, currently is a static goal
     private int[] possibleSideNumbers; //stores how many sides any given dice can have
+    private float interestRate; //the rate of interest that the debt accrues each turn
 
     private List<Die> allDice = new List<Die>();
     private List<Die> rollingDice = new List<Die>();
@@ -63,8 +68,9 @@ public class GameManager : MonoBehaviour
 
         inventoryPanel.SetActive(false);
         shopPanel.SetActive(false);
+        guidePanel.SetActive(false);
 
-        money = 0; //sets money to 0
+        money = 20.0f; //sets money to 0
         SetMoneyLabel(); //updates the money label
         newDieCost = 30; //sets the new die cost to the default value
         SetNewDiceCostLabel(); //updates the new die cost label
@@ -72,6 +78,7 @@ public class GameManager : MonoBehaviour
         SetTurnsRemainingLabel(); //updates the turns remaining label
         debt = 500.0f; //sets the debt to the default value
         SetDebtLabel(); //sets the debt label on the UI
+        interestRate = 1.03f;
         possibleSideNumbers = new int[] { 2, 4, 6, 8, 10, 12, 20 }; //sets the list of possible side numbers
         for (int i = 0; i < 3; i++)
         { //adds the default number of dice (3) of random side numbers to the players active dice
@@ -219,9 +226,17 @@ public class GameManager : MonoBehaviour
         shopPanel.SetActive(false);
     }
 
+    public void GuideButton() {
+        guidePanel.SetActive(true);
+    }
+
+    public void CloseGuideButton() {
+        guidePanel.SetActive(false);
+    }
+
     private void CalculateInterest()
     {
-        debt *= 1.01f;
+        debt *= interestRate;
         SetDebtLabel();
     }
 

@@ -1,9 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class D6 : Die
 {
+    [SerializeField]
+    private List<TMP_Text> sideTexts = new List<TMP_Text>();
+
+    public void Start()
+    {
+        for (int i = 0; i < sides.Count; i++)
+        {
+            sideTexts[i].text = sides[i].ToString();
+        }
+    }
+
     override protected Vector3 HitVector(int side)
     {
         switch (side)

@@ -74,7 +74,7 @@ public class GameManager : MonoBehaviour
 
         debugPanel.gameObject.SetActive(false);
 
-        d6 = Resources.Load<Die>("Prefabs/d6");
+        d6 = Resources.Load<Die>("Prefabs/Custom D6");
 
         inventoryPanel.SetActive(false);
         shopPanel.SetActive(false);
@@ -95,6 +95,12 @@ public class GameManager : MonoBehaviour
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
             allDice.Add(GameObject.Instantiate<Die>(d6));
             allDice[i].gameObject.SetActive(false);
+            /*
+            for(int j = 0; j < allDice[i].sides.Count; j++)
+            {
+                allDice[i].sides[j] = Random.Range(1, 100);
+            }
+            */
         }
         range = new int[2]; //sets up the range
         range[0] = 999999;

@@ -100,7 +100,8 @@ public class Die : MonoBehaviour
                     float nDelta = Mathf.Abs(localHitNormalized.x - testHitVector.x) + Mathf.Abs(localHitNormalized.y - testHitVector.y) + Mathf.Abs(localHitNormalized.z - testHitVector.z);
                     if (nDelta < delta)
                     {
-                        value = side;
+                        //value = side;
+                        value = sides[side-1];
                         delta = nDelta;
                     }
                 }

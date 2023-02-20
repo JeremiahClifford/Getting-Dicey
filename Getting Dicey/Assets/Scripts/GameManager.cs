@@ -17,6 +17,8 @@ public class GameManager : MonoBehaviour
     private TMP_Text turnsRemainingLabel;
     [SerializeField]
     private TMP_Text debtLabel;
+    [SerializeField]
+    private CanvasRenderer debugPanel;
 
     //inventory
     [SerializeField]
@@ -33,7 +35,7 @@ public class GameManager : MonoBehaviour
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction;
+    private InputAction rollDiceAction, enableDebugPanel;
 
     Die d6;
 
@@ -63,6 +65,14 @@ public class GameManager : MonoBehaviour
         {
             RollButton();
         };
+
+        enableDebugPanel.Enable();
+        enableDebugPanel.performed += (InputAction.CallbackContext obj) =>
+        {
+            debugPanel.gameObject.SetActive(!debugPanel.gameObject.activeSelf);
+        };
+
+        debugPanel.gameObject.SetActive(false);
 
         d6 = Resources.Load<Die>("Prefabs/d6");
 
@@ -98,10 +108,6 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void LateUpdate()
     {
-        foreach (Die d in rollingDice)
-        {
-            Debug.Log(d.value);
-        }
         if (isRolling)
         {
             bool check = true;
@@ -114,12 +120,22 @@ public class GameManager : MonoBehaviour
             }
             if (check)
             {
+                bool check2 = true;
                 foreach (Die d in rollingDice)
                 {
                     rolledDice.Add(d);
+                    if (d.value == 0)
+                    {
+                        check2 = false;
+                        d.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f));
+                        d.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-1f, 1f), 5f, Random.Range(-1f, 1f));
+                    }
                 }
-                rollingDice.Clear();
-                FinishedRolling();
+                if (check2)
+                {
+                    FinishedRolling();
+                    rollingDice.Clear();
+                }
             }
         }
     }
@@ -226,11 +242,13 @@ public class GameManager : MonoBehaviour
         shopPanel.SetActive(false);
     }
 
-    public void GuideButton() {
+    public void GuideButton()
+    {
         guidePanel.SetActive(true);
     }
 
-    public void CloseGuideButton() {
+    public void CloseGuideButton()
+    {
         guidePanel.SetActive(false);
     }
 
@@ -281,19 +299,16 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Called when the dice have finished rolling
+    /// 
     /// </summary>
-    private void FinishedRolling()
+    /// <returns>Returns true if all dice have successfully finished rolling</returns>
+    private bool FinishedRolling()
     {
         List<int> results = new List<int>();
         int totalPayout = 0;
 
         foreach (Die d in rolledDice)
         {
-            if (d.value == 0)
-            {
-                return;
-            }
             results.Add(d.value);
         }
 
@@ -343,5 +358,18 @@ public class GameManager : MonoBehaviour
 
         isRolling = false;
         rolledDice.Clear();
+        return true;
+    }
+
+    public void AddD6Debug()
+    {
+        allDice.Add(GameObject.Instantiate<Die>(d6));
+        allDice[allDice.Count - 1].gameObject.SetActive(false);
+    }
+
+    public void AddMoneyDebug()
+    {
+        money += 100;
+        SetMoneyLabel();
     }
 }

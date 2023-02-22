@@ -8,6 +8,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
+    private Camera cam;
+    [SerializeField]
     private TMP_Text moneyLabel;
     [SerializeField]
     private TMP_Text outputLabel;
@@ -35,7 +37,7 @@ public class GameManager : MonoBehaviour
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction, enableDebugPanel;
+    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn;
 
     Die d6;
 
@@ -70,6 +72,18 @@ public class GameManager : MonoBehaviour
         enableDebugPanel.performed += (InputAction.CallbackContext obj) =>
         {
             debugPanel.gameObject.SetActive(!debugPanel.gameObject.activeSelf);
+        };
+
+        moveCamOut.Enable();
+        moveCamOut.performed += (InputAction.CallbackContext obj) =>
+        {
+            cam.gameObject.transform.position = cam.gameObject.transform.position * 2;
+        };
+
+        moveCamIn.Enable();
+        moveCamIn.performed += (InputAction.CallbackContext obj) =>
+        {
+            cam.gameObject.transform.position = cam.gameObject.transform.position / 2;
         };
 
         debugPanel.gameObject.SetActive(false);
@@ -299,9 +313,9 @@ public class GameManager : MonoBehaviour
     {
         rollingDice.Add(die);
         die.gameObject.SetActive(true);
-        die.gameObject.transform.position = new Vector3(0f, 35f, -55f);
-        die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-10f, 10f), Random.Range(-10f, 10f), Random.Range(-10f, 10f));
-        die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 35f);
+        die.gameObject.transform.position = new Vector3(Random.Range(-40, 40), 40f, Random.Range(-40, 40));
+        die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-100f, 100f), Random.Range(-100f, 100f), Random.Range(-100f, 100f));
+        die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-30f, 30f), Random.Range(-30f, 0f), Random.Range(-30f, 30f));
     }
 
     /// <summary>

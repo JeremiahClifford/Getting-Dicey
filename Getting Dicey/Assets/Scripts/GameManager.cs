@@ -313,7 +313,7 @@ public class GameManager : MonoBehaviour
     {
         rollingDice.Add(die);
         die.gameObject.SetActive(true);
-        die.gameObject.transform.position = new Vector3(Random.Range(-40, 40), 40f, Random.Range(-40, 40));
+        die.gameObject.transform.position = new Vector3(Random.Range(-20, 20), 40f, Random.Range(-20, 20));
         die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-100f, 100f), Random.Range(-100f, 100f), Random.Range(-100f, 100f));
         die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-30f, 30f), Random.Range(-30f, 0f), Random.Range(-30f, 30f));
     }

@@ -8,11 +8,12 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
+    private GameObject tutorialManager;
+
+    [SerializeField]
     private TMP_Text moneyLabel;
     [SerializeField]
     private TMP_Text outputLabel;
-    [SerializeField]
-    private TMP_Text newDiceCostLabel;
     [SerializeField]
     private TMP_Text turnsRemainingLabel;
     [SerializeField]
@@ -105,6 +106,14 @@ public class GameManager : MonoBehaviour
             }
             */
         }
+        for(int i = 0; i < allDice[2].sides.Count; i++) //makes one of the starting dice different to show off the functionality in the build
+        {
+            allDice[2].sides[i] = 1;
+            if (i > 2) {
+                allDice[2].sides[i] = 6;
+            }
+        }
+        allDice[2].dieName = "The Coin Flip";
         range = new int[2]; //sets up the range
         range[0] = 999999;
         range[1] = 0;
@@ -180,12 +189,20 @@ public class GameManager : MonoBehaviour
         }
 
         outputLabel.text = "";
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 0) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void ShopButton()
     {
         shopPanel.SetActive(true);
         WriteShop();
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void Buy(int selection) {
@@ -250,10 +267,10 @@ public class GameManager : MonoBehaviour
     public void ViewButton()
     { //shows what dice the player has when the view button is pressed or when a new die is bought
         //shows the active dice
-        activeDiceListLabel.text = "";
+        activeDiceListLabel.text = allDice.Count + " Dice<br>";
         for (int i = 0; i < allDice.Count; i++)
         {
-            activeDiceListLabel.text += "d" + allDice[i].sides.Count + ":";
+            activeDiceListLabel.text += allDice[i].dieName + ": ";
             for (int j = 0; j < allDice[i].sides.Count; j++)
             {
                 activeDiceListLabel.text += " " + allDice[i].sides[j];
@@ -264,6 +281,10 @@ public class GameManager : MonoBehaviour
         //TODO: show the inactive dice
 
         inventoryPanel.SetActive(true);
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 1) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void CloseInventoryButton()
@@ -279,6 +300,10 @@ public class GameManager : MonoBehaviour
     public void GuideButton()
     {
         guidePanel.SetActive(true);
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 3) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void CloseGuideButton()

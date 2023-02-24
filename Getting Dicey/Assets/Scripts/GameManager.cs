@@ -10,11 +10,12 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Camera cam;
     [SerializeField]
+    private GameObject tutorialManager;
+
+    [SerializeField]
     private TMP_Text moneyLabel;
     [SerializeField]
     private TMP_Text outputLabel;
-    [SerializeField]
-    private TMP_Text newDiceCostLabel;
     [SerializeField]
     private TMP_Text turnsRemainingLabel;
     [SerializeField]
@@ -31,6 +32,8 @@ public class GameManager : MonoBehaviour
     //shop
     [SerializeField]
     private GameObject shopPanel;
+    [SerializeField]
+    private List<TMP_Text> dieForSale;
 
     //payout guide
     [SerializeField]
@@ -46,7 +49,6 @@ public class GameManager : MonoBehaviour
     //important variables for game logic
     public float money; //amount of money that the player has
     private int[] range; //holds the highest and lowest number that any of the player's dice can roll for optimization purposes while parsing results of a roll
-    private int newDieCost; //tracks the cost of a new die, increasing with each purchase
     private int turnsRemaining; //tracks how many turns the player has left, decreasing with each roll
     private float debt; //stores how much debt the player has, currently is a static goal
     private int[] possibleSideNumbers; //stores how many sides any given dice can have
@@ -55,6 +57,8 @@ public class GameManager : MonoBehaviour
     private List<Die> allDice = new List<Die>();
     private List<Die> rollingDice = new List<Die>();
     private List<Die> rolledDice = new List<Die>();
+
+    private List<Die> DiceForSale = new List<Die>();
 
     /// <summary>
     /// Called before the first active frame
@@ -94,16 +98,16 @@ public class GameManager : MonoBehaviour
         shopPanel.SetActive(false);
         guidePanel.SetActive(false);
 
+        DiceForSale.Add(d6); //TODO: adding different random dice
+        DiceForSale.Add(d6); //TODO: adding different random dice
+
         money = 20.0f; //sets money to 0
         SetMoneyLabel(); //updates the money label
-        newDieCost = 30; //sets the new die cost to the default value
-        SetNewDiceCostLabel(); //updates the new die cost label
         turnsRemaining = 20; //set the number of remaining turns to the default value
         SetTurnsRemainingLabel(); //updates the turns remaining label
         debt = 500.0f; //sets the debt to the default value
         SetDebtLabel(); //sets the debt label on the UI
         interestRate = 1.03f;
-        possibleSideNumbers = new int[] { 2, 4, 6, 8, 10, 12, 20 }; //sets the list of possible side numbers
         for (int i = 0; i < 3; i++)
         { //adds the default number of dice (3) of random side numbers to the players active dice
             //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
@@ -116,6 +120,14 @@ public class GameManager : MonoBehaviour
             }
             */
         }
+        for(int i = 0; i < allDice[2].sides.Count; i++) //makes one of the starting dice different to show off the functionality in the build
+        {
+            allDice[2].sides[i] = 1;
+            if (i > 2) {
+                allDice[2].sides[i] = 6;
+            }
+        }
+        allDice[2].dieName = "The Coin Flip";
         range = new int[2]; //sets up the range
         range[0] = 999999;
         range[1] = 0;
@@ -191,32 +203,65 @@ public class GameManager : MonoBehaviour
         }
 
         outputLabel.text = "";
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 0) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void ShopButton()
     {
         shopPanel.SetActive(true);
+        WriteShop();
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
-    public void BuyButton()
-    { //adds a new dice if the player has enough money when the buy button is pressed
-        if (money >= newDieCost)
-        {
-            allDice.Add(GameObject.Instantiate<Die>(d6));
+    public void Buy(int selection) {
+        if (money >= DiceForSale[selection].price) {
+            allDice.Add(GameObject.Instantiate<Die>(DiceForSale[selection]));
             allDice[allDice.Count - 1].gameObject.SetActive(false);
-            money -= newDieCost;
-            newDieCost += 10;
+            money -= DiceForSale[selection].price;
             SetMoneyLabel();
-            SetNewDiceCostLabel();
+            dieForSale[selection].transform.parent.gameObject.SetActive(false);
         }
-        else
-        {
-            outputLabel.text = "Insufficient Money to purchase a new die.";
+    }
+
+    private void StockShop() {
+        for (int i = 0; i < dieForSale.Count; i++) {
+            DiceForSale[i] = d6; //TODO: adding different random dice
+            dieForSale[i].transform.parent.gameObject.SetActive(true);
+        }
+        WriteShop();
+    }
+
+    public void WriteShop()
+    {
+        for (int j = 0; j < dieForSale.Count; j++) {
+            dieForSale[j].text = DiceForSale[0].dieName + "<br>Price $" + DiceForSale[0].price + "<br>";
+            dieForSale[j].text += "Sides: ";
+            for (int i = 0; i < DiceForSale[0].sides.Count; i++) {
+                dieForSale[j].text += " " + DiceForSale[0].sides[i];
+            }
+        }
+    }
+
+    public void RestockShop()
+    {
+        if (money >= 100) {
+            StockShop();
+            money -= 100;
+            SetMoneyLabel();
         }
     }
 
     public void Payoff(int amount)
     {
+        if (amount == -1) {
+            amount = (int)money;
+        }
         if (amount <= money)
         {
             money -= amount;
@@ -236,10 +281,10 @@ public class GameManager : MonoBehaviour
     public void ViewButton()
     { //shows what dice the player has when the view button is pressed or when a new die is bought
         //shows the active dice
-        activeDiceListLabel.text = "";
+        activeDiceListLabel.text = allDice.Count + " Dice<br>";
         for (int i = 0; i < allDice.Count; i++)
         {
-            activeDiceListLabel.text += "d" + allDice[i].sides.Count + ":";
+            activeDiceListLabel.text += allDice[i].dieName + ": ";
             for (int j = 0; j < allDice[i].sides.Count; j++)
             {
                 activeDiceListLabel.text += " " + allDice[i].sides[j];
@@ -250,6 +295,10 @@ public class GameManager : MonoBehaviour
         //TODO: show the inactive dice
 
         inventoryPanel.SetActive(true);
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 1) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void CloseInventoryButton()
@@ -265,6 +314,10 @@ public class GameManager : MonoBehaviour
     public void GuideButton()
     {
         guidePanel.SetActive(true);
+
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 3) {
+            tutorialManager.GetComponent<Tutorial>().NextStage();
+        }
     }
 
     public void CloseGuideButton()
@@ -281,11 +334,6 @@ public class GameManager : MonoBehaviour
     private void SetMoneyLabel()
     { //sets the money label
         moneyLabel.text = "$" + Mathf.Round(money);
-    }
-
-    private void SetNewDiceCostLabel()
-    { //sets the new die cost label
-        newDiceCostLabel.text = "New Dice Cost: " + newDieCost;
     }
 
     private void SetTurnsRemainingLabel()
@@ -361,20 +409,14 @@ public class GameManager : MonoBehaviour
         SetMoneyLabel();
         CalculateInterest();
 
-        //checks if the player wins or loses
-        if (money >= debt)
+        //checks if the player loses
+        turnsRemaining--;
+        SetTurnsRemainingLabel();
+        if (turnsRemaining <= 0)
         {
-            outputLabel.text += "<br>Game over:<br>You Win";
+            outputLabel.text += "<br>Game over:<br>You have Run out of time";
         }
-        else
-        {
-            turnsRemaining--;
-            SetTurnsRemainingLabel();
-            if (turnsRemaining <= 0)
-            {
-                outputLabel.text += "<br>Game over:<br>You have Run out of time";
-            }
-        }
+        StockShop();
 
         isRolling = false;
         rolledDice.Clear();

@@ -40,11 +40,12 @@ public class GameManager : MonoBehaviour
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn;
+    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause;
 
     Die d6;
 
     private bool isRolling = false;
+    private bool paused = false;
 
     //important variables for game logic
     public float money; //amount of money that the player has
@@ -90,6 +91,12 @@ public class GameManager : MonoBehaviour
             cam.gameObject.transform.position = cam.gameObject.transform.position / 2;
         };
 
+        pause.Enable();
+        pause.performed += (InputAction.CallbackContext obj) =>
+        {
+            paused = !paused;
+        };
+
         debugPanel.gameObject.SetActive(false);
 
         d6 = Resources.Load<Die>("Prefabs/Custom D6");
@@ -120,10 +127,11 @@ public class GameManager : MonoBehaviour
             }
             */
         }
-        for(int i = 0; i < allDice[2].sides.Count; i++) //makes one of the starting dice different to show off the functionality in the build
+        for (int i = 0; i < allDice[2].sides.Count; i++) //makes one of the starting dice different to show off the functionality in the build
         {
             allDice[2].sides[i] = 1;
-            if (i > 2) {
+            if (i > 2)
+            {
                 allDice[2].sides[i] = 6;
             }
         }
@@ -134,9 +142,20 @@ public class GameManager : MonoBehaviour
         CalculateRange(); //calculates the range
     }
 
+    public void Update()
+    {
+        if (paused)
+        {
+            Time.timeScale = 0f;
+        }
+        else
+        {
+            Time.timeScale = 1f;
+        }
+    }
 
     /// <summary>
-    /// Called every frame
+    /// Called every frame after update
     /// </summary>
     public void LateUpdate()
     {
@@ -204,7 +223,8 @@ public class GameManager : MonoBehaviour
 
         outputLabel.text = "";
 
-        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 0) {
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 0)
+        {
             tutorialManager.GetComponent<Tutorial>().NextStage();
         }
     }
@@ -214,13 +234,16 @@ public class GameManager : MonoBehaviour
         shopPanel.SetActive(true);
         WriteShop();
 
-        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2) {
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2)
+        {
             tutorialManager.GetComponent<Tutorial>().NextStage();
         }
     }
 
-    public void Buy(int selection) {
-        if (money >= DiceForSale[selection].price) {
+    public void Buy(int selection)
+    {
+        if (money >= DiceForSale[selection].price)
+        {
             allDice.Add(GameObject.Instantiate<Die>(DiceForSale[selection]));
             allDice[allDice.Count - 1].gameObject.SetActive(false);
             money -= DiceForSale[selection].price;
@@ -229,8 +252,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void StockShop() {
-        for (int i = 0; i < dieForSale.Count; i++) {
+    private void StockShop()
+    {
+        for (int i = 0; i < dieForSale.Count; i++)
+        {
             DiceForSale[i] = d6; //TODO: adding different random dice
             dieForSale[i].transform.parent.gameObject.SetActive(true);
         }
@@ -239,10 +264,12 @@ public class GameManager : MonoBehaviour
 
     public void WriteShop()
     {
-        for (int j = 0; j < dieForSale.Count; j++) {
+        for (int j = 0; j < dieForSale.Count; j++)
+        {
             dieForSale[j].text = DiceForSale[0].dieName + "<br>Price $" + DiceForSale[0].price + "<br>";
             dieForSale[j].text += "Sides: ";
-            for (int i = 0; i < DiceForSale[0].sides.Count; i++) {
+            for (int i = 0; i < DiceForSale[0].sides.Count; i++)
+            {
                 dieForSale[j].text += " " + DiceForSale[0].sides[i];
             }
         }
@@ -250,7 +277,8 @@ public class GameManager : MonoBehaviour
 
     public void RestockShop()
     {
-        if (money >= 100) {
+        if (money >= 100)
+        {
             StockShop();
             money -= 100;
             SetMoneyLabel();
@@ -259,7 +287,8 @@ public class GameManager : MonoBehaviour
 
     public void Payoff(int amount)
     {
-        if (amount == -1) {
+        if (amount == -1)
+        {
             amount = (int)money;
         }
         if (amount <= money)
@@ -296,7 +325,8 @@ public class GameManager : MonoBehaviour
 
         inventoryPanel.SetActive(true);
 
-        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 1) {
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 1)
+        {
             tutorialManager.GetComponent<Tutorial>().NextStage();
         }
     }
@@ -315,7 +345,8 @@ public class GameManager : MonoBehaviour
     {
         guidePanel.SetActive(true);
 
-        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 3) {
+        if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 3)
+        {
             tutorialManager.GetComponent<Tutorial>().NextStage();
         }
     }

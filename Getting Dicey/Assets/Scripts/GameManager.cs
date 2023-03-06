@@ -42,8 +42,6 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause;
 
-    Die d6;
-
     private bool isRolling = false;
     private bool paused = false;
 
@@ -52,7 +50,6 @@ public class GameManager : MonoBehaviour
     private int[] range; //holds the highest and lowest number that any of the player's dice can roll for optimization purposes while parsing results of a roll
     private int turnsRemaining; //tracks how many turns the player has left, decreasing with each roll
     private float debt; //stores how much debt the player has, currently is a static goal
-    private int[] possibleSideNumbers; //stores how many sides any given dice can have
     private float interestRate; //the rate of interest that the debt accrues each turn
 
     private List<Die> allDice = new List<Die>();
@@ -66,6 +63,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void Start()
     {
+        // Init dice manager
+        DiceManager.Init();
+
         // Press space to roll dice
         rollDiceAction.Enable();
         rollDiceAction.performed += (InputAction.CallbackContext obj) =>
@@ -99,14 +99,12 @@ public class GameManager : MonoBehaviour
 
         debugPanel.gameObject.SetActive(false);
 
-        d6 = Resources.Load<Die>("Prefabs/Custom D6");
-
         inventoryPanel.SetActive(false);
         shopPanel.SetActive(false);
         guidePanel.SetActive(false);
 
-        DiceForSale.Add(d6); //TODO: adding different random dice
-        DiceForSale.Add(d6); //TODO: adding different random dice
+        DiceForSale.Add(DiceManager.GetRandom());
+        DiceForSale.Add(DiceManager.GetRandom());
 
         money = 20.0f; //sets money to 0
         SetMoneyLabel(); //updates the money label
@@ -115,27 +113,9 @@ public class GameManager : MonoBehaviour
         debt = 500.0f; //sets the debt to the default value
         SetDebtLabel(); //sets the debt label on the UI
         interestRate = 1.03f;
-        for (int i = 0; i < 3; i++)
-        { //adds the default number of dice (3) of random side numbers to the players active dice
-            //activeDice.Add(new o_Die(possibleSideNumbers[Random.Range(0, possibleSideNumbers.Length)]));
-            allDice.Add(GameObject.Instantiate<Die>(d6));
-            allDice[i].gameObject.SetActive(false);
-            /*
-            for(int j = 0; j < allDice[i].sides.Count; j++)
-            {
-                allDice[i].sides[j] = Random.Range(1, 100);
-            }
-            */
-        }
-        for (int i = 0; i < allDice[2].sides.Count; i++) //makes one of the starting dice different to show off the functionality in the build
-        {
-            allDice[2].sides[i] = 1;
-            if (i > 2)
-            {
-                allDice[2].sides[i] = 6;
-            }
-        }
-        allDice[2].dieName = "The Coin Flip";
+        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
+        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
+        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.CoinFlip));
         range = new int[2]; //sets up the range
         range[0] = 999999;
         range[1] = 0;
@@ -256,7 +236,7 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < dieForSale.Count; i++)
         {
-            DiceForSale[i] = d6; //TODO: adding different random dice
+            DiceForSale.Add(DiceManager.GetRandom());
             dieForSale[i].transform.parent.gameObject.SetActive(true);
         }
         WriteShop();
@@ -456,7 +436,7 @@ public class GameManager : MonoBehaviour
 
     public void AddD6Debug()
     {
-        allDice.Add(GameObject.Instantiate<Die>(d6));
+        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
         allDice[allDice.Count - 1].gameObject.SetActive(false);
     }
 

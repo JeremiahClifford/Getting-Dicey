@@ -46,6 +46,10 @@ public class Die : MonoBehaviour
     public string dieName;
     [SerializeField]
     public float price;
+    [SerializeField]
+    public float earnings;
+    [SerializeField]
+    public string description;
 
     // true is die is still rolling
     public bool rolling

@@ -35,12 +35,16 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private List<TMP_Text> dieForSale;
 
+    //bank
+    [SerializeField]
+    private GameObject bankPanel;
+
     //payout guide
     [SerializeField]
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause;
+    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause, inventory, shop, bank;
 
     private bool isRolling = false;
     private bool paused = false;
@@ -96,12 +100,42 @@ public class GameManager : MonoBehaviour
         {
             paused = !paused;
         };
+        inventory.Enable();
+        inventory.performed += (InputAction.CallbackContext obj) =>
+        {
+            //shows the active dice
+            activeDiceListLabel.text = allDice.Count + " Dice<br>";
+            for (int i = 0; i < allDice.Count; i++)
+            {
+                activeDiceListLabel.text += allDice[i].dieName + ": ";
+                for (int j = 0; j < allDice[i].sides.Count; j++)
+                {
+                    activeDiceListLabel.text += " " + allDice[i].sides[j];
+                }
+                activeDiceListLabel.text += "<br>";
+            }
+
+            //TODO: show the inactive dice
+            
+            inventoryPanel.SetActive(!inventoryPanel.activeSelf);
+        };
+        shop.Enable();
+        shop.performed += (InputAction.CallbackContext obj) =>
+        {
+            shopPanel.SetActive(!shopPanel.activeSelf);
+        };
+        bank.Enable();
+        bank.performed += (InputAction.CallbackContext obj) =>
+        {
+            bankPanel.SetActive(!bankPanel.activeSelf);
+        };
 
         debugPanel.gameObject.SetActive(false);
 
         inventoryPanel.SetActive(false);
         shopPanel.SetActive(false);
         guidePanel.SetActive(false);
+        bankPanel.SetActive(false);
 
         DiceForSale.Add(DiceManager.GetRandom());
         DiceForSale.Add(DiceManager.GetRandom());
@@ -230,6 +264,10 @@ public class GameManager : MonoBehaviour
             SetMoneyLabel();
             dieForSale[selection].transform.parent.gameObject.SetActive(false);
         }
+
+        if (inventoryPanel.activeSelf) {
+            ViewButton();
+        }
     }
 
     private void StockShop()
@@ -319,6 +357,16 @@ public class GameManager : MonoBehaviour
     public void CloseShopButton()
     {
         shopPanel.SetActive(false);
+    }
+
+    public void BankButton()
+    {
+        bankPanel.SetActive(true);
+    }
+
+    public void CloseBankButton()
+    {
+        bankPanel.SetActive(false);
     }
 
     public void GuideButton()

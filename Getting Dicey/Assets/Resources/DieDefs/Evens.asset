@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Evens
   m_EditorClassIdentifier: 
   dieName: Evens
-  dieDescription: Only rolls 2, 4, and 6
+  dieDescription: Only rolls even numbers
   index: 2
   cost: 100
   earnings: 50
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
-  sideNums: 020000000400000006000000020000000400000006000000
+  sideNums: 020000000400000006000000080000000a0000000c000000

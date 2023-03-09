@@ -122,11 +122,14 @@ public class GameManager : MonoBehaviour
         shop.Enable();
         shop.performed += (InputAction.CallbackContext obj) =>
         {
+            bankPanel.SetActive(false);
+            WriteShop();
             shopPanel.SetActive(!shopPanel.activeSelf);
         };
         bank.Enable();
         bank.performed += (InputAction.CallbackContext obj) =>
         {
+            shopPanel.SetActive(false);
             bankPanel.SetActive(!bankPanel.activeSelf);
         };
 
@@ -149,7 +152,7 @@ public class GameManager : MonoBehaviour
         interestRate = 1.03f;
         allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
         allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
-        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.CoinFlip));
+        allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
         range = new int[2]; //sets up the range
         range[0] = 999999;
         range[1] = 0;
@@ -284,7 +287,7 @@ public class GameManager : MonoBehaviour
     {
         for (int j = 0; j < dieForSale.Count; j++)
         {
-            dieForSale[j].text = DiceForSale[0].dieName + "<br>Price $" + DiceForSale[0].price + "<br>";
+            dieForSale[j].text = DiceForSale[0].dieName + "<br>Price $" + DiceForSale[0].price + "<br>Payout: " + DiceForSale[0].earnings + "<br>";
             dieForSale[j].text += "Sides: ";
             for (int i = 0; i < DiceForSale[0].sides.Count; i++)
             {
@@ -337,6 +340,7 @@ public class GameManager : MonoBehaviour
                 activeDiceListLabel.text += " " + allDice[i].sides[j];
             }
             activeDiceListLabel.text += "<br>";
+            Debug.Log(allDice[i].dieName);
         }
 
         //TODO: show the inactive dice
@@ -459,8 +463,18 @@ public class GameManager : MonoBehaviour
             }
             if (numberOfInstances > 1)
             {
-                outputLabel.text += "<br>" + numberOfInstances + " " + i + "'s : " + (i * (numberOfInstances - 1) * 10);
-                totalPayout += i * (numberOfInstances - 1) * 10;
+                outputLabel.text += "<br>";
+                int instancePayout = 0;
+                for (int j = 0; j < allDice.Count; j++) {
+                    if (allDice[j].value == i) {
+                        totalPayout += (int)Mathf.Round(allDice[j].earnings);
+                        instancePayout += (int)Mathf.Round(allDice[j].earnings);
+                        outputLabel.text += i + ": " + allDice[j].earnings + " ";
+                    }
+                }
+                outputLabel.text += " = " + instancePayout;
+                //outputLabel.text += "<br>" + numberOfInstances + " " + i + "'s : " + (i * (numberOfInstances - 1) * 10);
+                //totalPayout += i * (numberOfInstances - 1) * 10;
             }
         }
         outputLabel.text += "<br>Total Payout: " + totalPayout;
@@ -475,7 +489,9 @@ public class GameManager : MonoBehaviour
         {
             outputLabel.text += "<br>Game over:<br>You have Run out of time";
         }
-        StockShop();
+        if ((20 - turnsRemaining) % 3 == 0) {
+            StockShop();
+        }
 
         isRolling = false;
         rolledDice.Clear();

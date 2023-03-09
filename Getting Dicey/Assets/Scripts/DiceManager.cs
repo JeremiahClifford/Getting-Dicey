@@ -9,7 +9,12 @@ public class DiceManager
         D6 = 0,
         CoinFlip = 1,
         Evens = 2,
-        Odds = 3
+        Odds = 3,
+        UpperD6 = 4,
+        UpperEvens = 5,
+        LowerEvens = 6,
+        UpperOdds = 7,
+        LowerOdds = 8
     }
 
     private static List<DieDef> dieList = new List<DieDef>();
@@ -33,7 +38,7 @@ public class DiceManager
             }
         }
         Die die = GameObject.Instantiate<Die>(def.prefab);
-        die.dieName = def.name;
+        die.dieName = def.dieName;
         die.description = def.dieDescription;
         die.price = def.cost;
         die.sides = def.sideNums;
@@ -45,7 +50,7 @@ public class DiceManager
     {
         DieDef def = dieList[Random.Range(0, dieList.Count - 1)];
         Die die = GameObject.Instantiate<Die>(def.prefab);
-        die.dieName = def.name;
+        die.dieName = def.dieName;
         die.description = def.dieDescription;
         die.price = def.cost;
         die.sides = def.sideNums;

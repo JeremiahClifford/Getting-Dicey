@@ -604,7 +604,7 @@ public class GameManager : MonoBehaviour
                 }
                 loopNum++;
                 debt = baseDebt * Mathf.Pow(2, loopNum - 1);
-                interestRate = 1 + ((interestRate - 1) * Mathf.Pow(2, loopNum - 1));
+                interestRate = 1 + ((interestRate - 1) * loopNum);
                 turnsRemaining = baseTurnsRemaining + (5 * (loopNum - 1));
                 tempDebt = 0;
                 tempMoney = 0;

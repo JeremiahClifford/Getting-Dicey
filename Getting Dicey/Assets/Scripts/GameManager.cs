@@ -613,6 +613,7 @@ public class GameManager : MonoBehaviour
                 outputLabel.text += "<br>You now owe " + debt + " at " + Mathf.Round((interestRate - 1) * 100) + "% interest!";
                 outputLabel.text += "<br>You have " + turnsRemaining + " turns to pay it off!";
                 outputLabel.text += "<br>You also have to pay taxes so you lose half your current money!";
+                /*
                 if (loopNum >= 3)
                 {
                     int diceLost = Random.Range(loopNum, loopNum + 2 * (loopNum - 1));
@@ -628,6 +629,7 @@ public class GameManager : MonoBehaviour
                         outputLabel.text += "<br>You dropped your dice and lost " + realDiceLost + " of them!";
                     }
                 }
+                */
                 SetMoneyLabel();
                 SetDebtLabel();
             }

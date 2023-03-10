@@ -20,6 +20,7 @@ public class ShopManager : MonoBehaviour
             GameManager.instance.AdjustMoney(-restockPrice);
             GameManager.instance.SetMoneyLabel();
             restockPrice += 25f * Mathf.Pow(2, GameManager.instance.loopNum - 1);
+            restockText.text = "Restock Shop: $" + restockPrice;
         }
     }
 
@@ -47,7 +48,7 @@ public class ShopManager : MonoBehaviour
 
     public void WriteShop()
     {
-
+        restockText.text = "Restock Shop: $" + restockPrice;
         for (int j = 0; j < dieShopLabels.Count; j++)
         {
             dieShopLabels[j].text = diceForSale[j].dieName + "<br>Price $" + diceForSale[j].cost + "<br>Payout: " + diceForSale[j].earnings + "<br>";

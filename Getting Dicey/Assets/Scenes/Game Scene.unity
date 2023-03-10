@@ -2680,7 +2680,7 @@ MonoBehaviour:
   dieShopLabels:
   - {fileID: 1933083791}
   - {fileID: 735494251}
-  restockText: {fileID: 0}
+  restockText: {fileID: 907844068}
 --- !u!1 &343491828
 GameObject:
   m_ObjectHideFlags: 0

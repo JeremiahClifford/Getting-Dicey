@@ -15,7 +15,7 @@ MonoBehaviour:
   dieName: Upper D6
   dieDescription: D6 with higher numbers
   index: 4
-  cost: 100
-  earnings: 50
+  cost: 75
+  earnings: 75
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
-  sideNums: 0700000008000000090000000a0000000b0000000c000000
+  sideNums: 08000000090000000a0000000b0000000c0000000d000000

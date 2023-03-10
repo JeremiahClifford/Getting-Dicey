@@ -14,10 +14,24 @@ public class DiceManager
         UpperEvens = 5,
         LowerEvens = 6,
         UpperOdds = 7,
-        LowerOdds = 8
+        LowerOdds = 8,
+        D10 = 9,
+        Ones = 10,
+        Twos = 11,
+        Threes = 12,
+        HighRoller = 13,
+        LowRoller = 14,
+        Thirteen = 15,
+        Pun = 16,
+        HighestEvens = 17
     }
 
     private static List<DieDef> dieList = new List<DieDef>();
+
+    public static int DieCount
+    {
+        get { return dieList.Count; }
+    }
 
     public static void Init()
     {
@@ -46,15 +60,10 @@ public class DiceManager
         return die;
     }
 
-    public static Die GetRandom()
+    public static DieDef GetRandomDef()
     {
-        DieDef def = dieList[Random.Range(0, dieList.Count - 1)];
-        Die die = GameObject.Instantiate<Die>(def.prefab);
-        die.dieName = def.dieName;
-        die.description = def.dieDescription;
-        die.price = def.cost;
-        die.sides = def.sideNums;
-        die.earnings = def.earnings;
-        return die;
+        int random = Random.Range(0, dieList.Count - 1);
+        DieDef def = dieList[random];
+        return def;
     }
 }

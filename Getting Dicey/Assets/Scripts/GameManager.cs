@@ -7,8 +7,19 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+    private enum GameState
+    {
+        Standing,
+        Sitting,
+        Shop,
+        Bank,
+        GameOver
+    }
+
     [SerializeField]
     private Camera cam;
+    [SerializeField]
+    private CameraController camController;
     [SerializeField]
     private GameObject tutorialManager;
 
@@ -19,9 +30,18 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TMP_Text turnsRemainingLabel;
     [SerializeField]
-    private TMP_Text debtLabel;
+    private TMP_Text debtLabel, interestLabel;
     [SerializeField]
     private CanvasRenderer debugPanel;
+    [SerializeField]
+    private GameObject standingUI, sittingUI, shopUI, bankUI, gameOverUI;
+    [SerializeField]
+    private ShopManager shop;
+
+    // Number effect
+    [SerializeField]
+    private NumberEffect numberEffect;
+    private float tempMoney;
 
     //inventory
     [SerializeField]
@@ -29,24 +49,14 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TMP_Text activeDiceListLabel;
 
-    //shop
-    [SerializeField]
-    private GameObject shopPanel;
-    [SerializeField]
-    private List<TMP_Text> dieForSale;
-
-    //bank
-    [SerializeField]
-    private GameObject bankPanel;
-
     //payout guide
     [SerializeField]
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause, inventory, shop, bank;
+    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause, inventory, openShop, bank;
 
-    private bool isRolling = false;
+    private bool isRolling = false, canRoll = true;
     private bool paused = false;
 
     //important variables for game logic
@@ -54,19 +64,28 @@ public class GameManager : MonoBehaviour
     private int[] range; //holds the highest and lowest number that any of the player's dice can roll for optimization purposes while parsing results of a roll
     private int turnsRemaining; //tracks how many turns the player has left, decreasing with each roll
     private float debt; //stores how much debt the player has, currently is a static goal
+    private float tempDebt; //stores how much debt the player has, currently is a static goal
     private float interestRate; //the rate of interest that the debt accrues each turn
+    public int loopNum = 1; // How many times the game has been beaten
+    private float baseDebt = 200f;
+    private int baseTurnsRemaining = 5;
+    private float baseInterest = 1.03f;
 
     private List<Die> allDice = new List<Die>();
     private List<Die> rollingDice = new List<Die>();
     private List<Die> rolledDice = new List<Die>();
 
-    private List<Die> DiceForSale = new List<Die>();
+    private GameState state = GameState.Standing;
+
+    public static GameManager instance;
 
     /// <summary>
     /// Called before the first active frame
     /// </summary>
     public void Start()
     {
+        instance = this;
+
         // Init dice manager
         DiceManager.Init();
 
@@ -116,43 +135,42 @@ public class GameManager : MonoBehaviour
             }
 
             //TODO: show the inactive dice
-            
+
             inventoryPanel.SetActive(!inventoryPanel.activeSelf);
         };
-        shop.Enable();
-        shop.performed += (InputAction.CallbackContext obj) =>
+        openShop.Enable();
+        openShop.performed += (InputAction.CallbackContext obj) =>
         {
-            bankPanel.SetActive(false);
-            WriteShop();
-            shopPanel.SetActive(!shopPanel.activeSelf);
+            state = GameState.Shop;
+            shop.WriteShop();
         };
         bank.Enable();
         bank.performed += (InputAction.CallbackContext obj) =>
         {
-            shopPanel.SetActive(false);
-            bankPanel.SetActive(!bankPanel.activeSelf);
+            state = GameState.Bank;
         };
 
         debugPanel.gameObject.SetActive(false);
 
         inventoryPanel.SetActive(false);
-        shopPanel.SetActive(false);
         guidePanel.SetActive(false);
-        bankPanel.SetActive(false);
 
-        DiceForSale.Add(DiceManager.GetRandom());
-        DiceForSale.Add(DiceManager.GetRandom());
+        shop.StockShop();
 
-        money = 20.0f; //sets money to 0
+        money = 150f;
         SetMoneyLabel(); //updates the money label
-        turnsRemaining = 20; //set the number of remaining turns to the default value
+        turnsRemaining = baseTurnsRemaining; //set the number of remaining turns to the default value
         SetTurnsRemainingLabel(); //updates the turns remaining label
-        debt = 500.0f; //sets the debt to the default value
+        debt = baseDebt; //sets the debt to the default value
+        interestRate = baseInterest;
         SetDebtLabel(); //sets the debt label on the UI
-        interestRate = 1.03f;
         allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
         allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
         allDice.Add(DiceManager.GetDie(DiceManager.DieIndex.D6));
+        foreach (Die d in allDice)
+        {
+            d.gameObject.SetActive(false);
+        }
         range = new int[2]; //sets up the range
         range[0] = 999999;
         range[1] = 0;
@@ -168,6 +186,74 @@ public class GameManager : MonoBehaviour
         else
         {
             Time.timeScale = 1f;
+        }
+
+        // State Machine
+        switch (state)
+        {
+            case GameState.Standing:
+                if (!camController.isAnimating())
+                {
+                    standingUI.gameObject.SetActive(true);
+                }
+                else
+                {
+                    standingUI.gameObject.SetActive(false);
+                }
+                sittingUI.gameObject.SetActive(false);
+                shopUI.gameObject.SetActive(false);
+                bankUI.gameObject.SetActive(false);
+                gameOverUI.gameObject.SetActive(false);
+                break;
+            case GameState.Sitting:
+                if (!camController.isAnimating() && canRoll)
+                {
+                    sittingUI.gameObject.SetActive(true);
+                }
+                else
+                {
+                    sittingUI.gameObject.SetActive(false);
+                }
+                standingUI.gameObject.SetActive(false);
+                shopUI.gameObject.SetActive(false);
+                bankUI.gameObject.SetActive(false);
+                gameOverUI.gameObject.SetActive(false);
+                break;
+            case GameState.Shop:
+                if (!camController.isAnimating())
+                {
+                    shopUI.gameObject.SetActive(true);
+                }
+                else
+                {
+                    shopUI.gameObject.SetActive(false);
+                }
+                sittingUI.gameObject.SetActive(false);
+                standingUI.gameObject.SetActive(false);
+                bankUI.gameObject.SetActive(false);
+                gameOverUI.gameObject.SetActive(false);
+                break;
+            case GameState.Bank:
+                if (!camController.isAnimating())
+                {
+                    bankUI.gameObject.SetActive(true);
+                }
+                else
+                {
+                    bankUI.gameObject.SetActive(false);
+                }
+                sittingUI.gameObject.SetActive(false);
+                shopUI.gameObject.SetActive(false);
+                standingUI.gameObject.SetActive(false);
+                gameOverUI.gameObject.SetActive(false);
+                break;
+            case GameState.GameOver:
+                gameOverUI.gameObject.SetActive(true);
+                sittingUI.gameObject.SetActive(false);
+                shopUI.gameObject.SetActive(false);
+                standingUI.gameObject.SetActive(false);
+                bankUI.gameObject.SetActive(false);
+                break;
         }
     }
 
@@ -229,9 +315,10 @@ public class GameManager : MonoBehaviour
     /// </summary>
     public void RollButton() //rolls all of the dice and parses the results when the roll button is pressed
     {
-        if (!isRolling)
+        if (!isRolling && canRoll)
         {
             isRolling = true;
+            canRoll = false;
             foreach (Die i in allDice)
             {
                 RollDie(i);
@@ -248,8 +335,8 @@ public class GameManager : MonoBehaviour
 
     public void ShopButton()
     {
-        shopPanel.SetActive(true);
-        WriteShop();
+        state = GameState.Shop;
+        shop.WriteShop();
 
         if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2)
         {
@@ -257,53 +344,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void Buy(int selection)
+    public void AdjustMoney(float adjustment)
     {
-        if (money >= DiceForSale[selection].price)
-        {
-            allDice.Add(GameObject.Instantiate<Die>(DiceForSale[selection]));
-            allDice[allDice.Count - 1].gameObject.SetActive(false);
-            money -= DiceForSale[selection].price;
-            SetMoneyLabel();
-            dieForSale[selection].transform.parent.gameObject.SetActive(false);
-        }
-
-        if (inventoryPanel.activeSelf) {
-            ViewButton();
-        }
+        money += adjustment;
     }
 
-    private void StockShop()
+    public bool CanAfford(float cost)
     {
-        for (int i = 0; i < dieForSale.Count; i++)
+        if (money >= cost)
         {
-            DiceForSale.Add(DiceManager.GetRandom());
-            dieForSale[i].transform.parent.gameObject.SetActive(true);
+            return true;
         }
-        WriteShop();
-    }
-
-    public void WriteShop()
-    {
-        for (int j = 0; j < dieForSale.Count; j++)
-        {
-            dieForSale[j].text = DiceForSale[0].dieName + "<br>Price $" + DiceForSale[0].price + "<br>Payout: " + DiceForSale[0].earnings + "<br>";
-            dieForSale[j].text += "Sides: ";
-            for (int i = 0; i < DiceForSale[0].sides.Count; i++)
-            {
-                dieForSale[j].text += " " + DiceForSale[0].sides[i];
-            }
-        }
-    }
-
-    public void RestockShop()
-    {
-        if (money >= 100)
-        {
-            StockShop();
-            money -= 100;
-            SetMoneyLabel();
-        }
+        return false;
     }
 
     public void Payoff(int amount)
@@ -321,8 +373,6 @@ public class GameManager : MonoBehaviour
         {
             money += -debt;
             debt = 0;
-            outputLabel.text = "<br>Game over:<br>You Win";
-            CloseShopButton();
         }
         SetMoneyLabel();
         SetDebtLabel();
@@ -358,19 +408,9 @@ public class GameManager : MonoBehaviour
         inventoryPanel.SetActive(false);
     }
 
-    public void CloseShopButton()
-    {
-        shopPanel.SetActive(false);
-    }
-
     public void BankButton()
     {
-        bankPanel.SetActive(true);
-    }
-
-    public void CloseBankButton()
-    {
-        bankPanel.SetActive(false);
+        state = GameState.Bank;
     }
 
     public void GuideButton()
@@ -388,25 +428,55 @@ public class GameManager : MonoBehaviour
         guidePanel.SetActive(false);
     }
 
+    public void SitButton()
+    {
+        state = GameState.Sitting;
+        camController.MoveTo(new Vector3(0, 77.5f, -57), new Vector3(62, 0, 0), 0.5f);
+    }
+
+    public void StandButton()
+    {
+        state = GameState.Standing;
+        camController.MoveTo(new Vector3(0, 65, -175), new Vector3(0, 0, 0), 0.5f);
+    }
+
     private void CalculateInterest()
     {
-        debt *= interestRate;
+        tempDebt = debt * interestRate - debt;
+        tempDebt = Mathf.Clamp(tempDebt, 0, float.MaxValue);
+        tempDebt = Mathf.Round(tempDebt);
         SetDebtLabel();
     }
 
-    private void SetMoneyLabel()
+    public void SetMoneyLabel()
     { //sets the money label
         moneyLabel.text = "$" + Mathf.Round(money);
+        if (tempMoney != 0)
+        {
+            moneyLabel.text += " <#FFBC00><size=22>+ $" + Mathf.Round(tempMoney);
+        }
     }
 
-    private void SetTurnsRemainingLabel()
+    public void SetTurnsRemainingLabel()
     { //sets the turns remaining label
         turnsRemainingLabel.text = "Turns Remaining: " + turnsRemaining;
     }
 
-    private void SetDebtLabel()
+    public void SetDebtLabel()
     {
         debtLabel.text = "Debt: " + Mathf.Round(debt);
+        tempDebt = Mathf.Clamp(tempDebt, 0, float.MaxValue);
+        if (tempDebt < 0.001)
+        {
+            tempDebt = 0f;
+        }
+
+        if (tempDebt != 0)
+        {
+            debtLabel.text += " <color=red><size=22>+ $" + Mathf.Round(tempDebt);
+        }
+
+        interestLabel.text = "Interest: " + Mathf.Round((interestRate - 1) * 100) + "%";
     }
 
     public void SaveAndExit()
@@ -424,78 +494,60 @@ public class GameManager : MonoBehaviour
     {
         rollingDice.Add(die);
         die.gameObject.SetActive(true);
-        die.gameObject.transform.position = new Vector3(Random.Range(-20, 20), 40f, Random.Range(-20, 20));
-        die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-100f, 100f), Random.Range(-100f, 100f), Random.Range(-100f, 100f));
-        die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-30f, 30f), Random.Range(-30f, 0f), Random.Range(-30f, 30f));
+        die.gameObject.transform.position = new Vector3(Random.Range(-20, 20), 50f, Random.Range(-20, 20));
+        die.gameObject.GetComponent<Rigidbody>().angularVelocity = new Vector3(Random.Range(-200f, 200f), Random.Range(-200f, 200f), Random.Range(-200f, 200f));
+        die.gameObject.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-50f, 50f), Random.Range(-50f, 0f), Random.Range(-50f, 50f));
     }
 
     /// <summary>
     /// 
     /// </summary>
-    /// <returns>Returns true if all dice have successfully finished rolling</returns>
-    private bool FinishedRolling()
+    private void FinishedRolling()
     {
-        List<int> results = new List<int>();
-        int totalPayout = 0;
-
-        foreach (Die d in rolledDice)
-        {
-            results.Add(d.value);
-        }
-
-        //displays the results to the screen
-        outputLabel.text = "Results:";
-        for (int i = 0; i < results.Count; i++)
-        {
-            outputLabel.text += " " + results[i];
-        }
-
+        List<DiceMatch> diceMatches = new List<DiceMatch>();
         //parses the results, calculating the total payout and writing it to the display
         for (int i = range[0]; i < range[1] + 1; i++)
         {
             int numberOfInstances = 0;
-            for (int j = 0; j < results.Count; j++)
+            List<Die> d = new List<Die>();
+            for (int j = 0; j < rolledDice.Count; j++)
             {
-                if (results[j] == i)
+                if (rolledDice[j].value == i)
                 {
                     numberOfInstances++;
+                    d.Add(rolledDice[j]);
                 }
             }
             if (numberOfInstances > 1)
             {
-                outputLabel.text += "<br>";
-                int instancePayout = 0;
-                for (int j = 0; j < allDice.Count; j++) {
-                    if (allDice[j].value == i) {
-                        totalPayout += (int)Mathf.Round(allDice[j].earnings);
-                        instancePayout += (int)Mathf.Round(allDice[j].earnings);
-                        outputLabel.text += i + ": " + allDice[j].earnings + " ";
-                    }
-                }
-                outputLabel.text += " = " + instancePayout;
-                //outputLabel.text += "<br>" + numberOfInstances + " " + i + "'s : " + (i * (numberOfInstances - 1) * 10);
-                //totalPayout += i * (numberOfInstances - 1) * 10;
+                DiceMatch match = new DiceMatch();
+                match.dice = d;
+                diceMatches.Add(match);
             }
         }
+        DoPayoutEffects(diceMatches);
+        /*
         outputLabel.text += "<br>Total Payout: " + totalPayout;
         money += totalPayout;
         SetMoneyLabel();
         CalculateInterest();
+        */
 
         //checks if the player loses
         turnsRemaining--;
         SetTurnsRemainingLabel();
-        if (turnsRemaining <= 0)
+        if (turnsRemaining % loopNum == 0)
         {
-            outputLabel.text += "<br>Game over:<br>You have Run out of time";
-        }
-        if ((20 - turnsRemaining) % 3 == 0) {
-            StockShop();
+            shop.StockShop();
         }
 
         isRolling = false;
         rolledDice.Clear();
-        return true;
+    }
+    public void AddDie(Die die)
+    {
+        allDice.Add(die);
+        allDice[allDice.Count - 1].gameObject.SetActive(false);
     }
 
     public void AddD6Debug()
@@ -508,5 +560,142 @@ public class GameManager : MonoBehaviour
     {
         money += 100;
         SetMoneyLabel();
+    }
+
+    private void DoPayoutEffects(List<DiceMatch> matches)
+    {
+        int i = 0;
+        for (i = 0; i < matches.Count; i++)
+        {
+            StartCoroutine(DisplayMatch(matches[i], 0.7f * i));
+        }
+        StartCoroutine(FinishMatches((i + 1) * 0.7f));
+    }
+
+    private IEnumerator DisplayMatch(DiceMatch match, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        foreach (Die d in match.dice)
+        {
+            NumberEffect effect = Instantiate<NumberEffect>(numberEffect);
+            effect.gameObject.transform.position = d.gameObject.transform.position;
+            effect.SetAmount(d.earnings);
+
+            tempMoney += d.earnings;
+            SetMoneyLabel();
+        }
+    }
+
+    private IEnumerator FinishMatches(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        canRoll = true;
+        if (turnsRemaining <= 0)
+        {
+            if (debt == 0 || money + tempMoney >= debt + tempDebt)
+            {
+                money = money + tempMoney;
+                debt = debt + tempDebt;
+                outputLabel.text = "You Win!";
+                if (money >= debt)
+                {
+                    outputLabel.text += "<br>Your debt has been deducted from your current money.";
+                    money -= debt;
+                }
+                loopNum++;
+                debt = baseDebt * Mathf.Pow(2, loopNum - 1);
+                interestRate = 1 + ((interestRate - 1) * Mathf.Pow(2, loopNum - 1));
+                turnsRemaining = baseTurnsRemaining + (5 * (loopNum - 1));
+                tempDebt = 0;
+                tempMoney = 0;
+                money = money / 2;
+                outputLabel.text += "<br><br>But unfortunately it looks like you've managed rack up even more debt.";
+                outputLabel.text += "<br>You now owe " + debt + " at " + Mathf.Round((interestRate - 1) * 100) + "% interest!";
+                outputLabel.text += "<br>You have " + turnsRemaining + " turns to pay it off!";
+                outputLabel.text += "<br>You also have to pay taxes so you lose half your current money!";
+                if (loopNum >= 3)
+                {
+                    int diceLost = Random.Range(loopNum, loopNum + 2 * (loopNum - 1));
+                    int realDiceLost = 0;
+                    for (int i = 0; i < diceLost && allDice.Count >= 4 * (loopNum / 2); i++)
+                    {
+                        realDiceLost++;
+                        int index = Random.Range(0, allDice.Count);
+                        Destroy(allDice[index]);
+                    }
+                    if (realDiceLost > 0)
+                    {
+                        outputLabel.text += "<br>You dropped your dice and lost " + realDiceLost + " of them!";
+                    }
+                }
+                SetMoneyLabel();
+                SetDebtLabel();
+            }
+            else
+            {
+                outputLabel.text = "You failed to pay off your debt";
+                state = GameState.GameOver;
+            }
+            outputLabel.gameObject.SetActive(true);
+        }
+        else
+        {
+            CalculateInterest();
+        }
+        if (tempMoney != 0)
+        {
+            float decrease = tempMoney / 20;
+            int i = 0;
+            for (i = 0; i < 20; i++)
+            {
+                StartCoroutine(DecreaseTempMoney(0.025f * i, decrease));
+            }
+        }
+        if (tempDebt != 0)
+        {
+            float decrease = tempDebt / 20;
+            int i = 0;
+            for (i = 0; i < 20; i++)
+            {
+                StartCoroutine(DecreaseTempDebt((0.025f * i) + 1f, decrease));
+            }
+        }
+    }
+
+    private IEnumerator DecreaseTempMoney(float delay, float decrease)
+    {
+        yield return new WaitForSeconds(delay);
+        if (tempMoney < decrease)
+        {
+            money += tempMoney;
+            tempMoney = 0;
+        }
+        else
+        {
+            money += decrease;
+            tempMoney -= decrease;
+        }
+        SetMoneyLabel();
+    }
+
+    private IEnumerator DecreaseTempDebt(float delay, float decrease)
+    {
+        yield return new WaitForSeconds(delay);
+        if (tempDebt < decrease)
+        {
+            debt += tempDebt;
+            tempDebt = 0;
+        }
+        else
+        {
+            debt += decrease;
+            tempDebt -= decrease;
+        }
+        SetDebtLabel();
+    }
+
+    private struct DiceMatch
+    {
+        public List<Die> dice;
     }
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   dieName: Lower Evens
   dieDescription: Only rolls even numbers below 7
   index: 6
-  cost: 100
-  earnings: 50
+  cost: 50
+  earnings: 25
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
   sideNums: 020000000200000004000000040000000600000006000000

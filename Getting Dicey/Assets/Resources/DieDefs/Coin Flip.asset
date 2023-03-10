@@ -15,7 +15,7 @@ MonoBehaviour:
   dieName: Coin Flip
   dieDescription: Can only roll 1 or 6
   index: 1
-  cost: 100
-  earnings: 50
+  cost: 50
+  earnings: 25
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
   sideNums: 010000000100000001000000060000000600000006000000

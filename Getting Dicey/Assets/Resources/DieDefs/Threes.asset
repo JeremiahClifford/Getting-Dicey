@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3050ea9f694dd164f97c2f19d2d40176, type: 3}
+  m_Name: Threes
+  m_EditorClassIdentifier: 
+  dieName: Three is Company
+  dieDescription: Only has multiplies of 3
+  index: 12
+  cost: 75
+  earnings: 50
+  prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
+  sideNums: 0300000003000000060000000600000009000000090000000c0000000c0000000f0000000f000000

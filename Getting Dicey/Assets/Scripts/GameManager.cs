@@ -71,6 +71,11 @@ public class GameManager : MonoBehaviour
     private int baseTurnsRemaining = 5;
     private float baseInterest = 1.03f;
 
+    //stores the level the player is own, ie the number of times that they have payed off their debt
+    private int debtIterations;
+    [SerializeField]
+    private string[] levelText;
+
     private List<Die> allDice = new List<Die>();
     private List<Die> rollingDice = new List<Die>();
     private List<Die> rolledDice = new List<Die>();
@@ -156,6 +161,9 @@ public class GameManager : MonoBehaviour
         guidePanel.SetActive(false);
 
         shop.StockShop();
+
+        debtIterations = 0;
+        outputLabel.text += levelText[debtIterations];
 
         money = 150f;
         SetMoneyLabel(); //updates the money label
@@ -594,12 +602,16 @@ public class GameManager : MonoBehaviour
         {
             if (debt == 0 || money + tempMoney >= debt + tempDebt)
             {
+                debtIterations++;
+                if (debtIterations >= levelText.Length) {
+                    debtIterations = levelText.Length - 1;
+                }
                 money = money + tempMoney;
                 debt = debt + tempDebt;
                 outputLabel.text = "You Win!";
                 if (money >= debt)
                 {
-                    outputLabel.text += "<br>Your debt has been deducted from your current money.";
+                    outputLabel.text += "<br>You pay off the last of your debt with some of the cash you have on hand.";
                     money -= debt;
                 }
                 loopNum++;
@@ -609,10 +621,11 @@ public class GameManager : MonoBehaviour
                 tempDebt = 0;
                 tempMoney = 0;
                 money = money / 2;
-                outputLabel.text += "<br><br>But unfortunately it looks like you've managed rack up even more debt.";
-                outputLabel.text += "<br>You now owe " + debt + " at " + Mathf.Round((interestRate - 1) * 100) + "% interest!";
-                outputLabel.text += "<br>You have " + turnsRemaining + " turns to pay it off!";
-                outputLabel.text += "<br>You also have to pay taxes so you lose half your current money!";
+                outputLabel.text += levelText[debtIterations];
+                //outputLabel.text += "<br><br>But unfortunately it looks like you've managed rack up even more debt.";
+                //outputLabel.text += "<br>You now owe " + debt + " at " + Mathf.Round((interestRate - 1) * 100) + "% interest!";
+                //outputLabel.text += "<br>You have " + turnsRemaining + " turns to pay it off!";
+                //outputLabel.text += "<br>You also have to pay taxes so you lose half your current money!";
                 /*
                 if (loopNum >= 3)
                 {

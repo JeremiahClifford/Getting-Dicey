@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.4465785, g: 0.49641252, b: 0.574817, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -10687,7 +10687,7 @@ MonoBehaviour:
       m_Flags: 0
     m_Flags: 0
   openShop:
-    m_Name: 
+    m_Name: Open Shop
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 215448a4-4920-4797-a6c6-4c37652de50b
@@ -10714,6 +10714,27 @@ MonoBehaviour:
     m_Flags: 0
   money: 0
   loopNum: 1
+  levelText:
+  - Out of school and into the world with only a little bit of debt. Unfortunately
+    you graduated into a financial crisis and you have no career prospects. You have
+    to turn to gambling to pay off your student debt.
+  - Just in time to purchase a car with a loan. You could pay it off with your job
+    but you don't have one, so you'll have to gamble a bit more. You can get a job
+    later.
+  - Now that you've paid off your car you can put a down payment on a house and get
+    a mortgage. You still haven't gotten a job because you've been so busy at this
+    casino paying off your previousdebts so it looks like you'll have to do a bit
+    more gambling.
+  - You're partner has been "subtly" "hinting" that its about time that you should
+    get married and the ring should be expensive you you start a payment plan for
+    the expensive ring you bought. Better get to paying that off.
+  - You've paid off the engagement ring just in time to pay for the extravigant distination
+    wedding that your fiancee is demanding.
+  - You've finally paid off the loans you had to take to pay for your wedding but
+    now your spouse is insisting that part of your house needs to be renivated but
+    you don't have enough cash so you better take out another loan.
+  - Right as you have paid off the last renovation, your spouse is insisting that
+    another room needs work so another loan.
 --- !u!4 &1870188427
 Transform:
   m_ObjectHideFlags: 0

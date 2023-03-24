@@ -68,8 +68,8 @@ public class GameManager : MonoBehaviour
     private float interestRate; //the rate of interest that the debt accrues each turn
     public int loopNum = 1; // How many times the game has been beaten
     private float baseDebt = 200f;
-    private int baseTurnsRemaining = 5;
-    private float baseInterest = 1.03f;
+    private int baseTurnsRemaining = 6;
+    private float baseInterest = 1.005f;
 
     //stores the level the player is own, ie the number of times that they have payed off their debt
     private int debtIterations;
@@ -617,7 +617,7 @@ public class GameManager : MonoBehaviour
                 loopNum++;
                 debt = baseDebt * Mathf.Pow(2, loopNum - 1);
                 interestRate = 1 + ((baseInterest - 1) * loopNum);
-                turnsRemaining = baseTurnsRemaining + (5 * (loopNum - 1));
+                turnsRemaining = baseTurnsRemaining + (2 * (loopNum - 1));
                 tempDebt = 0;
                 tempMoney = 0;
                 money = money / 2;

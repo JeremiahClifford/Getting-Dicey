@@ -11,6 +11,7 @@ public class ShopManager : MonoBehaviour
     private TMP_Text restockText;
     private List<DieDef> diceForSale = new List<DieDef>();
     private float restockPrice = 50f;
+    private int diceBought = 0;
 
     public void RestockShop()
     {
@@ -26,12 +27,14 @@ public class ShopManager : MonoBehaviour
 
     public void Buy(int selection)
     {
-        if (GameManager.instance.CanAfford(diceForSale[selection].cost))
+        if (GameManager.instance.CanAfford(diceForSale[selection].cost * (1 + ((diceBought * (GameManager.instance.loopNum)) * 0.1f))))
         {
             GameManager.instance.AddDie(DiceManager.GetDie(diceForSale[selection].index));
-            GameManager.instance.AdjustMoney(-diceForSale[selection].cost);
+            GameManager.instance.AdjustMoney(-(diceForSale[selection].cost * (1 + ((diceBought * (GameManager.instance.loopNum)) * 0.1f))));
             GameManager.instance.SetMoneyLabel();
+            diceBought++;
             dieShopLabels[selection].transform.parent.gameObject.SetActive(false);
+            WriteShop();
         }
     }
 
@@ -51,7 +54,7 @@ public class ShopManager : MonoBehaviour
         restockText.text = "Restock Shop: $" + restockPrice;
         for (int j = 0; j < dieShopLabels.Count; j++)
         {
-            dieShopLabels[j].text = diceForSale[j].dieName + "<br>Price $" + diceForSale[j].cost + "<br>Payout: " + diceForSale[j].earnings + "<br>";
+            dieShopLabels[j].text = diceForSale[j].dieName + "<br>Price $" + diceForSale[j].cost * (1 + ((diceBought * (GameManager.instance.loopNum)) * 0.1f)) + "<br>Payout: " + diceForSale[j].earnings + "<br>";
             dieShopLabels[j].text += "Sides: ";
             for (int i = 0; i < diceForSale[j].sideNums.Count; i++)
             {

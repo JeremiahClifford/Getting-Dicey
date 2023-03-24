@@ -514,7 +514,7 @@ public class GameManager : MonoBehaviour
     {
         List<DiceMatch> diceMatches = new List<DiceMatch>();
         //parses the results, calculating the total payout and writing it to the display
-        for (int i = range[0]; i < range[1] + 1; i++)
+        for (int i = 0; i <= 20; i++)
         {
             int numberOfInstances = 0;
             List<Die> d = new List<Die>();

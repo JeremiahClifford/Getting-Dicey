@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3050ea9f694dd164f97c2f19d2d40176, type: 3}
   m_Name: HighestEvens
   m_EditorClassIdentifier: 
-  dieName: Evens
+  dieName: Highest Evens
   dieDescription: Only rolls very high even numbers
   index: 17
   cost: 100

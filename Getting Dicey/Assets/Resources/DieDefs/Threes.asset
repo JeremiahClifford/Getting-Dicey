@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Only has multiplies of 3
   index: 12
   cost: 75
-  earnings: 50
+  payout: 65
   prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
   sideNums: 0300000003000000060000000600000009000000090000000c0000000c0000000f0000000f000000

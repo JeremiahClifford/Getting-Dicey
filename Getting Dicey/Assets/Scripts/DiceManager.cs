@@ -54,9 +54,9 @@ public class DiceManager
         Die die = GameObject.Instantiate<Die>(def.prefab);
         die.dieName = def.dieName;
         die.description = def.dieDescription;
-        die.price = def.cost;
+        die.cost = def.cost;
         die.sides = def.sideNums;
-        die.earnings = def.earnings;
+        die.payout = def.payout;
         return die;
     }
 

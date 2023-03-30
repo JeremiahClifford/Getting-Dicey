@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour
     private GameObject guidePanel;
 
     [SerializeField]
-    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause, inventory, openShop, bank;
+    private InputAction rollDiceAction, enableDebugPanel, moveCamOut, moveCamIn, pause, inventory, openShop, bank, mouseClick;
 
     private bool isRolling = false, canRoll = true;
     private bool paused = false;
@@ -96,6 +96,9 @@ public class GameManager : MonoBehaviour
 
         // Init dice manager
         DiceManager.Init();
+
+        cam.gameObject.transform.position = new Vector3(0, 65, -175);
+        cam.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
 
         // Press space to roll dice
         rollDiceAction.Enable();
@@ -150,12 +153,19 @@ public class GameManager : MonoBehaviour
         openShop.performed += (InputAction.CallbackContext obj) =>
         {
             state = GameState.Shop;
-            shop.WriteShop();
         };
         bank.Enable();
         bank.performed += (InputAction.CallbackContext obj) =>
         {
             state = GameState.Bank;
+        };
+        mouseClick.Enable();
+        mouseClick.performed += (InputAction.CallbackContext obj) =>
+        {
+            if (state == GameState.Shop) 
+            {
+                shop.MouseClickToBuy();
+            }
         };
 
         debugPanel.gameObject.SetActive(false);
@@ -349,7 +359,7 @@ public class GameManager : MonoBehaviour
     public void ShopButton()
     {
         state = GameState.Shop;
-        shop.WriteShop();
+        camController.MoveTo(new Vector3(175, 75, -150), new Vector3(0, 90, 0), 1f);
 
         if (tutorialManager.GetComponent<Tutorial>().tutorialStage == 2)
         {
@@ -549,10 +559,7 @@ public class GameManager : MonoBehaviour
         //checks if the player loses
         turnsRemaining--;
         SetTurnsRemainingLabel();
-        if (turnsRemaining % loopNum == 0)
-        {
-            shop.StockShop();
-        }
+        shop.UpdateRestock();
 
         isRolling = false;
         rolledDice.Clear();
@@ -598,9 +605,9 @@ public class GameManager : MonoBehaviour
         {
             NumberEffect effect = Instantiate<NumberEffect>(numberEffect);
             effect.gameObject.transform.position = d.gameObject.transform.position;
-            effect.SetAmount(d.earnings);
+            effect.SetAmount(d.payout);
 
-            tempMoney += d.earnings;
+            tempMoney += d.payout;
             SetMoneyLabel();
         }
     }

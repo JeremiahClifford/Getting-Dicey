@@ -15,7 +15,7 @@ MonoBehaviour:
   dieName: Seven ate Nine
   dieDescription: Only rolls 7, 8 or 9
   index: 16
-  cost: 100
-  earnings: 75
+  cost: 150
+  payout: 100
   prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
   sideNums: 07000000080000000900000007000000080000000900000007000000080000000900000007000000

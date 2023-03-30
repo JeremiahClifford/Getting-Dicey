@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Even numbers are replaced with 2
   index: 11
   cost: 75
-  earnings: 35
+  payout: 50
   prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
   sideNums: 01000000020000000300000002000000050000000200000007000000020000000900000002000000

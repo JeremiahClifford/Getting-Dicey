@@ -12,7 +12,7 @@ public class DieDef : ScriptableObject
     public DiceManager.DieIndex index;
 
     [SerializeField]
-    public float cost, earnings;
+    public float cost, payout;
 
     [SerializeField]
     public Die prefab;

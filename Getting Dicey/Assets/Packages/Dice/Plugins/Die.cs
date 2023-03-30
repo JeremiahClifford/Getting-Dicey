@@ -45,9 +45,9 @@ public class Die : MonoBehaviour
     [SerializeField]
     public string dieName;
     [SerializeField]
-    public float price;
+    public float cost;
     [SerializeField]
-    public float earnings;
+    public float payout;
     [SerializeField]
     public string description;
 
@@ -65,16 +65,19 @@ public class Die : MonoBehaviour
     {
         get
         {
-            // create a Ray from straight above this Die , moving downwards
-            Ray ray = new Ray(transform.position + (new Vector3(0, 2, 0) * transform.localScale.magnitude), Vector3.up * -1);
-            RaycastHit hit = new RaycastHit();
-            // cast the ray and validate it against this die's collider
-            if (GetComponent<Collider>().Raycast(ray, out hit, 3 * transform.localScale.magnitude))
+            if (GetComponent<Collider>())
             {
-                // we got a hit so we determine the local normalized vector from the die center to the face that was hit.
-                // because we are using local space, each die side will have its own local hit vector coordinates that will always be the same.
-                localHitNormalized = transform.InverseTransformPoint(hit.point.x, hit.point.y, hit.point.z).normalized;
-                return true;
+                // create a Ray from straight above this Die , moving downwards
+                Ray ray = new Ray(transform.position + (new Vector3(0, 2, 0) * transform.localScale.magnitude), Vector3.up * -1);
+                RaycastHit hit = new RaycastHit();
+                // cast the ray and validate it against this die's collider
+                if (GetComponent<Collider>().Raycast(ray, out hit, 3 * transform.localScale.magnitude))
+                {
+                    // we got a hit so we determine the local normalized vector from the die center to the face that was hit.
+                    // because we are using local space, each die side will have its own local hit vector coordinates that will always be the same.
+                    localHitNormalized = transform.InverseTransformPoint(hit.point.x, hit.point.y, hit.point.z).normalized;
+                    return true;
+                }
             }
             // in theory we should not get at this position!
             return false;

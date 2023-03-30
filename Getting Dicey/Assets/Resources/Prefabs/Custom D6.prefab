@@ -1102,7 +1102,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f30ba6ed7f478aa3e98d951ea8a097a6, type: 2}
+  - {fileID: 2100000, guid: 44aff4a456c6380459e43fea78edebe1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1155,8 +1155,8 @@ MonoBehaviour:
   value: 0
   sides: 010000000200000003000000040000000500000006000000
   dieName: Basic D6
-  price: 30
-  earnings: 0
+  cost: 0
+  payout: 0
   description: 
   sideTexts:
   - {fileID: 2738178901308412661}

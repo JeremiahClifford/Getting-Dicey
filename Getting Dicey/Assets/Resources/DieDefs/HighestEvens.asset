@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Only rolls very high even numbers
   index: 17
   cost: 100
-  earnings: 100
+  payout: 75
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
   sideNums: 0a0000000c0000000e0000000a0000000c0000000e000000

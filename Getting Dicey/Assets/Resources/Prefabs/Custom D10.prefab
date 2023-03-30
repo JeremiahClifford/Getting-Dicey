@@ -74,7 +74,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: f30ba6ed7f478aa3e98d951ea8a097a6, type: 2}
+  - {fileID: 2100000, guid: 44aff4a456c6380459e43fea78edebe1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -141,8 +141,8 @@ MonoBehaviour:
   value: 0
   sides: 0100000002000000030000000400000005000000060000000700000008000000090000000a000000
   dieName: D10
-  price: 100
-  earnings: 50
+  cost: 0
+  payout: 0
   description: Standard D10
   sideTexts:
   - {fileID: 6123390595516413420}

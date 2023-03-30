@@ -1,17 +1,68 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ShopManager : MonoBehaviour
 {
     [SerializeField]
-    private List<TMP_Text> dieShopLabels;
+    private List<ShopSlot> slots = new List<ShopSlot>();
     [SerializeField]
-    private TMP_Text restockText;
-    private List<DieDef> diceForSale = new List<DieDef>();
+    private TMP_Text restockText, restockTime;
     private float restockPrice = 50f;
-    private int diceBought = 0;
+    public int diceBought = 0;
+    private int turnsToRestock = 2;
+
+    // The percent increase of dice each round
+    private float diceCostMultPerRound = 0.1f;
+
+    // The base cost increase per dice bought
+    private float diceCostIncreasePerBuy = 10;
+
+    private void Update()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            foreach (ShopSlot slot in slots)
+            {
+                if (hit.collider == slot.hoverCollider)
+                {
+                    slot.SetHover(true);
+                }
+                else
+                {
+                    slot.SetHover(false);
+                }
+            }
+        }
+        else
+        {
+            foreach (ShopSlot slot in slots)
+            {
+                slot.SetHover(false);
+            }
+        }
+    }
+
+    public void MouseClickToBuy()
+    {
+        RaycastHit hit;
+        Ray ray = Camera.main.ScreenPointToRay(Mouse.current.position.ReadValue());
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            foreach (ShopSlot slot in slots)
+            {
+                if (hit.collider == slot.hoverCollider)
+                {
+                    slot.Buy();
+                }
+            }
+        }
+    }
 
     public void RestockShop()
     {
@@ -20,35 +71,34 @@ public class ShopManager : MonoBehaviour
             StockShop();
             GameManager.instance.AdjustMoney(-restockPrice);
             GameManager.instance.SetMoneyLabel();
-            restockPrice += 25f * Mathf.Pow(2, GameManager.instance.loopNum - 1);
+            restockPrice += 25f;
             restockText.text = "Restock Shop: $" + restockPrice;
-        }
-    }
-
-    public void Buy(int selection)
-    {
-        if (GameManager.instance.CanAfford(diceForSale[selection].cost * (1 + ((diceBought * (GameManager.instance.loopNum)) * 0.1f))))
-        {
-            GameManager.instance.AddDie(DiceManager.GetDie(diceForSale[selection].index));
-            GameManager.instance.AdjustMoney(-(diceForSale[selection].cost * (1 + ((diceBought * (GameManager.instance.loopNum)) * 0.1f))));
-            GameManager.instance.SetMoneyLabel();
-            diceBought++;
-            dieShopLabels[selection].transform.parent.gameObject.SetActive(false);
-            WriteShop();
         }
     }
 
     public void StockShop()
     {
-        diceForSale.Clear();
-        for (int i = 0; i < dieShopLabels.Count; i++)
+        restockTime.text = turnsToRestock + " turns until restock";
+        for (int i = 0; i < slots.Count; i++)
         {
-            diceForSale.Add(DiceManager.GetRandomDef());
-            dieShopLabels[i].transform.parent.gameObject.SetActive(true);
+            DieDef def = DiceManager.GetRandomDef();
+            float cost = (def.cost + (diceCostIncreasePerBuy * diceBought)) * (1 + (diceCostMultPerRound * (GameManager.instance.loopNum - 1)));
+            slots[i].SetDie(def, def.dieName, cost, def.payout);
         }
-        WriteShop();
     }
 
+    public void UpdateRestock()
+    {
+        turnsToRestock--;
+        if (turnsToRestock <= 0)
+        {
+            StockShop();
+            turnsToRestock = 2 + GameManager.instance.loopNum - 1;
+        }
+        restockTime.text = turnsToRestock + " turns until restock";
+    }
+
+    /*
     public void WriteShop()
     {
         restockText.text = "Restock Shop: $" + restockPrice;
@@ -62,4 +112,5 @@ public class ShopManager : MonoBehaviour
             }
         }
     }
+    */
 }

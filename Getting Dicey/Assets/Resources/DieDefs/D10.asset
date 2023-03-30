@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Standard D10
   index: 9
   cost: 50
-  earnings: 50
+  payout: 25
   prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
   sideNums: 0100000002000000030000000400000005000000060000000700000008000000090000000a000000

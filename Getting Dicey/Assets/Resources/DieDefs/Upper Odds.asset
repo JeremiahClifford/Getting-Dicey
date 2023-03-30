@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Only rolls odd numbers above 6
   index: 7
   cost: 75
-  earnings: 50
+  payout: 75
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
   sideNums: 070000000700000009000000090000000b0000000b000000

@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Only rolls odd numbers
   index: 3
   cost: 50
-  earnings: 35
+  payout: 50
   prefab: {fileID: -8735993669454292623, guid: 3f156abad4ca0ec4aa60a2584163f8c8, type: 3}
   sideNums: 01000000030000000500000007000000090000000b000000

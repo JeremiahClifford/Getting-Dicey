@@ -16,6 +16,6 @@ MonoBehaviour:
   dieDescription: Rolls between 1 and 5
   index: 14
   cost: 50
-  earnings: 30
+  payout: 35
   prefab: {fileID: 2819039510170682896, guid: 7defde6dec4b9a34e93714193858316c, type: 3}
   sideNums: 01000000010000000200000002000000030000000300000004000000040000000500000005000000

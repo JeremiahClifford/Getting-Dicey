@@ -71,6 +71,9 @@ public class GameManager : MonoBehaviour
     private int baseTurnsRemaining = 6;
     private float baseInterest = 1.005f;
 
+    private int bankCycle;
+    private int bankCycleLength = 4;
+
     //stores the level the player is own, ie the number of times that they have payed off their debt
     private int debtIterations;
     [SerializeField]
@@ -164,6 +167,8 @@ public class GameManager : MonoBehaviour
 
         debtIterations = 0;
         outputLabel.text += levelText[debtIterations];
+
+        bankCycle = 0;
 
         money = 150f;
         SetMoneyLabel(); //updates the money label
@@ -551,6 +556,12 @@ public class GameManager : MonoBehaviour
 
         isRolling = false;
         rolledDice.Clear();
+
+        bankCycle++;
+        if (bankCycle == bankCycleLength) {
+            BankButton();
+            bankCycle = 0;
+        }
     }
     public void AddDie(Die die)
     {
@@ -622,6 +633,7 @@ public class GameManager : MonoBehaviour
                 tempMoney = 0;
                 money = money / 2;
                 outputLabel.text += levelText[debtIterations];
+                bankCycle = 0;
                 //outputLabel.text += "<br><br>But unfortunately it looks like you've managed rack up even more debt.";
                 //outputLabel.text += "<br>You now owe " + debt + " at " + Mathf.Round((interestRate - 1) * 100) + "% interest!";
                 //outputLabel.text += "<br>You have " + turnsRemaining + " turns to pay it off!";
